@@ -1,101 +1,98 @@
-// Mock data for courses
-let courses = [
-    {
-        id: 1,
-        code: 'CS101',
-        title: 'Introduction to Computer Science',
-        credits: 4,
-        department_id: 1,
-        department_name: 'Computer Science & Engineering',
-        description: 'Fundamentals of computer science',
-        theory_hours: 3,
-        lab_hours: 2,
-        is_elective: false,
-        requires_lab: true
-    },
-    {
-        id: 2,
-        code: 'CS201',
-        title: 'Data Structures and Algorithms',
-        credits: 4,
-        department_id: 1,
-        department_name: 'Computer Science & Engineering',
-        description: 'Study of data structures and algorithms',
-        theory_hours: 3,
-        lab_hours: 2,
-        is_elective: false,
-        requires_lab: true
-    },
-    {
-        id: 3,
-        code: 'CS301',
-        title: 'Database Management Systems',
-        credits: 3,
-        department_id: 1,
-        department_name: 'Computer Science & Engineering',
-        description: 'Database concepts and SQL',
-        theory_hours: 3,
-        lab_hours: 0,
-        is_elective: false,
-        requires_lab: false
-    },
-    {
-        id: 4,
-        code: 'CS302',
-        title: 'Web Development',
-        credits: 3,
-        department_id: 1,
-        department_name: 'Computer Science & Engineering',
-        description: 'Modern web development technologies',
-        theory_hours: 2,
-        lab_hours: 2,
-        is_elective: true,
-        requires_lab: true
-    },
-    {
-        id: 5,
-        code: 'ECE101',
-        title: 'Electronics Fundamentals',
-        credits: 4,
-        department_id: 2,
-        department_name: 'Electronics & Communication Engineering',
-        description: 'Basic electronics concepts',
-        theory_hours: 3,
-        lab_hours: 2,
-        is_elective: false,
-        requires_lab: true
-    }
-];
+// API Configuration
+const API_BASE_URL = 'http://localhost:8000/api/v1';
 
-let departments = [
-    { id: 1, code: 'CSE', name: 'Computer Science & Engineering' },
-    { id: 2, code: 'ECE', name: 'Electronics & Communication Engineering' },
-    { id: 3, code: 'ME', name: 'Mechanical Engineering' },
-    { id: 4, code: 'CE', name: 'Civil Engineering' },
-    { id: 5, code: 'EEE', name: 'Electrical & Electronics Engineering' }
-];
-
-let filteredCourses = [...courses];
+// State
+let courses = [];
+let departments = [];
+let filteredCourses = [];
 let editingCourseId = null;
 
+// Helper function to get auth token
+function getAuthToken() {
+    return localStorage.getItem('token');
+}
+
+// Helper function to make API calls
+async function apiCall(endpoint, method = 'GET', data = null) {
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+
+    const token = getAuthToken();
+    if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (data) {
+        options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'API request failed');
+    }
+
+    return await response.json();
+}
+
 // Initialize page
-window.onload = function() {
-    loadDepartments();
-    renderCourses();
-    updateStats();
+window.onload = async function() {
+    try {
+        await loadDepartments();
+        await loadCourses();
+        renderCourses();
+        updateStats();
+    } catch (error) {
+        console.error('Error initializing page:', error);
+        alert('Failed to load data: ' + error.message);
+    }
 };
 
-// Load departments into dropdowns
-function loadDepartments() {
-    const filterSelect = document.getElementById('filterDepartment');
-    const courseSelect = document.getElementById('courseDepartment');
-    
-    departments.forEach(dept => {
-        const option1 = new Option(dept.name, dept.id);
-        const option2 = new Option(dept.name, dept.id);
-        filterSelect.add(option1);
-        courseSelect.add(option2);
-    });
+// Load departments from API
+async function loadDepartments() {
+    try {
+        departments = await apiCall('/departments/');
+        const filterSelect = document.getElementById('filterDepartment');
+        const courseSelect = document.getElementById('courseDepartment');
+        
+        // Clear existing options except the first one
+        filterSelect.innerHTML = '<option value="">All Departments</option>';
+        courseSelect.innerHTML = '<option value="">Select Department</option>';
+        
+        departments.forEach(dept => {
+            const option1 = new Option(dept.name, dept.id);
+            const option2 = new Option(dept.name, dept.id);
+            filterSelect.add(option1);
+            courseSelect.add(option2);
+        });
+    } catch (error) {
+        console.error('Error loading departments:', error);
+        throw error;
+    }
+}
+
+// Load courses from API
+async function loadCourses() {
+    try {
+        courses = await apiCall('/courses/');
+        // Enrich courses with department names
+        courses = courses.map(course => {
+            const dept = departments.find(d => d.id === course.department_id);
+            return {
+                ...course,
+                department_name: dept ? dept.name : 'Unknown'
+            };
+        });
+        filteredCourses = [...courses];
+    } catch (error) {
+        console.error('Error loading courses:', error);
+        throw error;
+    }
 }
 
 // Render courses table
@@ -110,7 +107,7 @@ function renderCourses() {
     tbody.innerHTML = filteredCourses.map(course => `
         <tr>
             <td><strong>${course.code}</strong></td>
-            <td>${course.title}</td>
+            <td>${course.name}</td>
             <td>${course.credits}</td>
             <td>${course.department_name}</td>
             <td>
@@ -123,8 +120,8 @@ function renderCourses() {
                     ${course.requires_lab ? 'Yes' : 'No'}
                 </span>
             </td>
-            <td>${course.theory_hours || '-'}</td>
-            <td>${course.lab_hours || '-'}</td>
+            <td>${course.theory_hours || 0}</td>
+            <td>${course.lab_hours || 0}</td>
             <td class="actions">
                 <button class="btn-edit" onclick="editCourse(${course.id})">Edit</button>
                 <button class="btn-danger" onclick="deleteCourse(${course.id})">Delete</button>
@@ -145,7 +142,7 @@ function searchCourses() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     filteredCourses = courses.filter(course => 
         course.code.toLowerCase().includes(searchTerm) ||
-        course.title.toLowerCase().includes(searchTerm) ||
+        course.name.toLowerCase().includes(searchTerm) ||
         course.department_name.toLowerCase().includes(searchTerm)
     );
     renderCourses();
@@ -195,62 +192,72 @@ function editCourse(id) {
     document.getElementById('modalTitle').textContent = 'Edit Course';
     document.getElementById('courseId').value = course.id;
     document.getElementById('courseCode').value = course.code;
-    document.getElementById('courseTitle').value = course.title;
+    document.getElementById('courseTitle').value = course.name;
     document.getElementById('courseCredits').value = course.credits;
     document.getElementById('courseDepartment').value = course.department_id;
     document.getElementById('courseDescription').value = course.description || '';
-    document.getElementById('theoryHours').value = course.theory_hours || '';
-    document.getElementById('labHours').value = course.lab_hours || '';
-    document.getElementById('isElective').checked = course.is_elective;
-    document.getElementById('requiresLab').checked = course.requires_lab;
+    document.getElementById('theoryHours').value = course.theory_hours || 0;
+    document.getElementById('labHours').value = course.lab_hours || 0;
+    document.getElementById('isElective').checked = course.is_elective || false;
+    document.getElementById('requiresLab').checked = course.requires_lab || false;
     
     document.getElementById('courseModal').classList.add('active');
 }
 
 // Delete course
-function deleteCourse(id) {
-    if (confirm('Are you sure you want to delete this course?')) {
+async function deleteCourse(id) {
+    if (!confirm('Are you sure you want to delete this course?')) return;
+    
+    try {
+        await apiCall(`/courses/${id}`, 'DELETE');
         courses = courses.filter(c => c.id !== id);
         filteredCourses = filteredCourses.filter(c => c.id !== id);
         renderCourses();
         updateStats();
+        alert('Course deleted successfully');
+    } catch (error) {
+        console.error('Error deleting course:', error);
+        alert('Failed to delete course: ' + error.message);
     }
 }
 
 // Save course
-function saveCourse(event) {
+async function saveCourse(event) {
     event.preventDefault();
     
     const deptId = parseInt(document.getElementById('courseDepartment').value);
-    const dept = departments.find(d => d.id === deptId);
     
+    // API expects these exact fields
     const courseData = {
-        id: editingCourseId || Date.now(),
         code: document.getElementById('courseCode').value,
-        title: document.getElementById('courseTitle').value,
+        name: document.getElementById('courseTitle').value,
         credits: parseInt(document.getElementById('courseCredits').value),
         department_id: deptId,
-        department_name: dept ? dept.name : '',
-        description: document.getElementById('courseDescription').value,
         theory_hours: parseInt(document.getElementById('theoryHours').value) || 0,
         lab_hours: parseInt(document.getElementById('labHours').value) || 0,
+        tutorial_hours: 0,
         is_elective: document.getElementById('isElective').checked,
         requires_lab: document.getElementById('requiresLab').checked
     };
     
-    if (editingCourseId) {
-        const index = courses.findIndex(c => c.id === editingCourseId);
-        if (index !== -1) {
-            courses[index] = courseData;
+    try {
+        let savedCourse;
+        if (editingCourseId) {
+            savedCourse = await apiCall(`/courses/${editingCourseId}`, 'PUT', courseData);
+        } else {
+            savedCourse = await apiCall('/courses/', 'POST', courseData);
         }
-    } else {
-        courses.push(courseData);
+        
+        // Reload courses from API
+        await loadCourses();
+        renderCourses();
+        updateStats();
+        closeModal();
+        alert('Course saved successfully');
+    } catch (error) {
+        console.error('Error saving course:', error);
+        alert('Failed to save course: ' + error.message);
     }
-    
-    filteredCourses = [...courses];
-    renderCourses();
-    updateStats();
-    closeModal();
 }
 
 // Close modal

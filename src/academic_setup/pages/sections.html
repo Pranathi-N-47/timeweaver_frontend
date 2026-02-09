@@ -36,9 +36,9 @@
             <h3>Filters</h3>
             <div class="filters-grid">
                 <div class="form-group">
-                    <label for="filterSemester">Semester</label>
+                    <label for="filterSemester">Department</label>
                     <select id="filterSemester" onchange="applyFilters()">
-                        <option value="">All Semesters</option>
+                        <option value="">All Departments</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -63,9 +63,9 @@
                 <thead>
                     <tr>
                         <th>Section Name</th>
-                        <th>Semester</th>
-                        <th>Max Students</th>
-                        <th>Current Students</th>
+                        <th>Department</th>
+                        <th>Batch Years</th>
+                        <th>Student Count</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -88,24 +88,29 @@
                     
                     <div class="form-group">
                         <label for="sectionName">Section Name <span class="required">*</span></label>
-                        <input type="text" id="sectionName" required placeholder="e.g., Section A">
+                        <input type="text" id="sectionName" required placeholder="e.g., CSE-A">
                     </div>
 
                     <div class="form-group">
-                        <label for="semesterId">Semester <span class="required">*</span></label>
-                        <select id="semesterId" required>
-                            <option value="">Select Semester</option>
+                        <label for="departmentId">Department <span class="required">*</span></label>
+                        <select id="departmentId" required>
+                            <option value="">Select Department</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="maxStudents">Maximum Students <span class="required">*</span></label>
-                        <input type="number" id="maxStudents" required min="1" max="200" placeholder="e.g., 60">
+                        <label for="batchYearStart">Batch Year Start <span class="required">*</span></label>
+                        <input type="number" id="batchYearStart" required min="2020" max="2100" placeholder="e.g., 2023">
                     </div>
 
                     <div class="form-group">
-                        <label for="currentStudents">Current Students</label>
-                        <input type="number" id="currentStudents" min="0" placeholder="e.g., 45">
+                        <label for="batchYearEnd">Batch Year End <span class="required">*</span></label>
+                        <input type="number" id="batchYearEnd" required min="2020" max="2100" placeholder="e.g., 2027">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentCount">Student Count <span class="required">*</span></label>
+                        <input type="number" id="studentCount" required min="1" max="200" placeholder="e.g., 60">
                     </div>
 
                     <div class="modal-footer">

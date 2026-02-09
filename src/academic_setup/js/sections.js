@@ -1,34 +1,110 @@
-let sections = [
-    { id: 1, name: 'Section A', semester_id: 1, semester_name: 'Fall 2024', max_students: 60, current_students: 58 },
-    { id: 2, name: 'Section B', semester_id: 1, semester_name: 'Fall 2024', max_students: 60, current_students: 55 },
-    { id: 3, name: 'Section C', semester_id: 2, semester_name: 'Spring 2025', max_students: 50, current_students: 48 }
-];
+// API Configuration
+const API_BASE_URL = 'http://localhost:8000/api/v1';
 
-let semesters = [
-    { id: 1, name: 'Fall 2024' },
-    { id: 2, name: 'Spring 2025' },
-    { id: 3, name: 'Fall 2025' }
-];
-
-let filteredSections = [...sections];
+// State
+let sections = [];
+let semesters = [];
+let departments = [];
+let filteredSections = [];
 let editingSectionId = null;
 
-window.onload = function() {
-    loadSemesters();
-    renderSections();
-    updateStats();
+// Helper function to get auth token
+function getAuthToken() {
+    return localStorage.getItem('token');
+}
+
+// Helper function to make API calls
+async function apiCall(endpoint, method = 'GET', data = null) {
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+
+    const token = getAuthToken();
+    if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (data) {
+        options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'API request failed');
+    }
+
+    return await response.json();
+}
+
+window.onload = async function() {
+    try {
+        await loadDepartments();
+        await loadSemesters();
+        await loadSections();
+        renderSections();
+        updateStats();
+    } catch (error) {
+        console.error('Error initializing page:', error);
+        alert('Failed to load data: ' + error.message);
+    }
 };
 
-function loadSemesters() {
-    const filterSelect = document.getElementById('filterSemester');
-    const sectionSelect = document.getElementById('semesterId');
-    
-    semesters.forEach(sem => {
-        const option1 = new Option(sem.name, sem.id);
-        const option2 = new Option(sem.name, sem.id);
-        filterSelect.add(option1);
-        sectionSelect.add(option2);
-    });
+async function loadDepartments() {
+    try {
+        departments = await apiCall('/departments/');
+    } catch (error) {
+        console.error('Error loading departments:', error);
+        throw error;
+    }
+}
+
+async function loadSemesters() {
+    try {
+        const filterSelect = document.getElementById('filterSemester');
+        const sectionSelect = document.getElementById('departmentId');
+        
+        // Clear existing options
+        filterSelect.innerHTML = '<option value="">All Departments</option>';
+        
+        // Load departments for filter dropdown
+        departments.forEach(dept => {
+            const option1 = new Option(dept.name, dept.id);
+            filterSelect.add(option1);
+        });
+        
+        // Load departments for form dropdown
+        sectionSelect.innerHTML = '<option value="">Select Department</option>';
+        departments.forEach(dept => {
+            const option2 = new Option(dept.name, dept.id);
+            sectionSelect.add(option2);
+        });
+    } catch (error) {
+        console.error('Error loading dropdowns:', error);
+        throw error;
+    }
+}
+
+async function loadSections() {
+    try {
+        sections = await apiCall('/sections/');
+        // Enrich sections with department names
+        sections = sections.map(section => {
+            const dept = departments.find(d => d.id === section.department_id);
+            return {
+                ...section,
+                department_name: dept ? dept.name : 'Unknown'
+            };
+        });
+        filteredSections = [...sections];
+    } catch (error) {
+        console.error('Error loading sections:', error);
+        throw error;
+    }
 }
 
 function renderSections() {
@@ -42,11 +118,11 @@ function renderSections() {
     tbody.innerHTML = filteredSections.map(section => `
         <tr>
             <td><strong>${section.name}</strong></td>
-            <td>${section.semester_name}</td>
-            <td>${section.max_students}</td>
+            <td>${section.department_name}</td>
+            <td>${section.batch_year_start}-${section.batch_year_end}</td>
             <td>
-                <span class="badge ${section.current_students >= section.max_students ? 'badge-info' : 'badge-success'}">
-                    ${section.current_students}
+                <span class="badge badge-info">
+                    ${section.student_count}
                 </span>
             </td>
             <td class="actions">
@@ -65,16 +141,16 @@ function searchSections() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     filteredSections = sections.filter(section => 
         section.name.toLowerCase().includes(searchTerm) ||
-        section.semester_name.toLowerCase().includes(searchTerm)
+        section.department_name.toLowerCase().includes(searchTerm)
     );
     renderSections();
 }
 
 function applyFilters() {
-    const semesterFilter = document.getElementById('filterSemester').value;
+    const deptFilter = document.getElementById('filterSemester').value;
     
     filteredSections = sections.filter(section => {
-        if (semesterFilter && section.semester_id != semesterFilter) return false;
+        if (deptFilter && section.department_id != deptFilter) return false;
         return true;
     });
     
@@ -103,48 +179,58 @@ function editSection(id) {
     document.getElementById('modalTitle').textContent = 'Edit Section';
     document.getElementById('sectionId').value = section.id;
     document.getElementById('sectionName').value = section.name;
-    document.getElementById('semesterId').value = section.semester_id;
-    document.getElementById('maxStudents').value = section.max_students;
-    document.getElementById('currentStudents').value = section.current_students || 0;
+    document.getElementById('departmentId').value = section.department_id;
+    document.getElementById('batchYearStart').value = section.batch_year_start;
+    document.getElementById('batchYearEnd').value = section.batch_year_end;
+    document.getElementById('studentCount').value = section.student_count || 0;
     
     document.getElementById('sectionModal').classList.add('active');
 }
 
-function deleteSection(id) {
-    if (confirm('Are you sure you want to delete this section?')) {
+async function deleteSection(id) {
+    if (!confirm('Are you sure you want to delete this section?')) return;
+    
+    try {
+        await apiCall(`/sections/${id}`, 'DELETE');
         sections = sections.filter(s => s.id !== id);
         filteredSections = filteredSections.filter(s => s.id !== id);
         renderSections();
         updateStats();
+        alert('Section deleted successfully');
+    } catch (error) {
+        console.error('Error deleting section:', error);
+        alert('Failed to delete section: ' + error.message);
     }
 }
 
-function saveSection(event) {
+async function saveSection(event) {
     event.preventDefault();
     
-    const semId = parseInt(document.getElementById('semesterId').value);
-    const semester = semesters.find(s => s.id === semId);
-    
+    // API expects: department_id, name, batch_year_start, batch_year_end, student_count
     const sectionData = {
-        id: editingSectionId || Date.now(),
+        department_id: parseInt(document.getElementById('departmentId').value),
         name: document.getElementById('sectionName').value,
-        semester_id: semId,
-        semester_name: semester ? semester.name : '',
-        max_students: parseInt(document.getElementById('maxStudents').value),
-        current_students: parseInt(document.getElementById('currentStudents').value) || 0
+        batch_year_start: parseInt(document.getElementById('batchYearStart').value),
+        batch_year_end: parseInt(document.getElementById('batchYearEnd').value),
+        student_count: parseInt(document.getElementById('studentCount').value) || 0
     };
     
-    if (editingSectionId) {
-        const index = sections.findIndex(s => s.id === editingSectionId);
-        if (index !== -1) sections[index] = sectionData;
-    } else {
-        sections.push(sectionData);
+    try {
+        if (editingSectionId) {
+            await apiCall(`/sections/${editingSectionId}`, 'PUT', sectionData);
+        } else {
+            await apiCall('/sections/', 'POST', sectionData);
+        }
+        
+        await loadSections();
+        renderSections();
+        updateStats();
+        closeModal();
+        alert('Section saved successfully');
+    } catch (error) {
+        console.error('Error saving section:', error);
+        alert('Failed to save section: ' + error.message);
     }
-    
-    filteredSections = [...sections];
-    renderSections();
-    updateStats();
-    closeModal();
 }
 
 function closeModal() {

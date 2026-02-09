@@ -1,16 +1,64 @@
-let semesters = [
-    { id: 1, name: 'Fall 2024', start_date: '2024-08-01', end_date: '2024-12-15', academic_year: '2024-2025', is_active: true },
-    { id: 2, name: 'Spring 2025', start_date: '2025-01-10', end_date: '2025-05-20', academic_year: '2024-2025', is_active: false },
-    { id: 3, name: 'Fall 2025', start_date: '2025-08-01', end_date: '2025-12-15', academic_year: '2025-2026', is_active: false }
-];
+// API Configuration
+const API_BASE_URL = 'http://localhost:8000/api/v1';
 
-let filteredSemesters = [...semesters];
+// State
+let semesters = [];
+let filteredSemesters = [];
 let editingSemesterId = null;
 
-window.onload = function() {
-    renderSemesters();
-    updateStats();
+// Helper function to get auth token
+function getAuthToken() {
+    return localStorage.getItem('token');
+}
+
+// Helper function to make API calls
+async function apiCall(endpoint, method = 'GET', data = null) {
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+
+    const token = getAuthToken();
+    if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (data) {
+        options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'API request failed');
+    }
+
+    return await response.json();
+}
+
+window.onload = async function() {
+    try {
+        await loadSemesters();
+        renderSemesters();
+        updateStats();
+    } catch (error) {
+        console.error('Error initializing page:', error);
+        alert('Failed to load data: ' + error.message);
+    }
 };
+
+async function loadSemesters() {
+    try {
+        semesters = await apiCall('/semesters/');
+        filteredSemesters = [...semesters];
+    } catch (error) {
+        console.error('Error loading semesters:', error);
+        throw error;
+    }
+}
 
 function renderSemesters() {
     const tbody = document.getElementById('semestersTableBody');
@@ -75,43 +123,57 @@ function editSemester(id) {
     document.getElementById('startDate').value = semester.start_date;
     document.getElementById('endDate').value = semester.end_date;
     document.getElementById('academicYear').value = semester.academic_year;
+    document.getElementById('semesterType').value = semester.semester_type || 'ODD';
     document.getElementById('isActive').checked = semester.is_active;
     
     document.getElementById('semesterModal').classList.add('active');
 }
 
-function deleteSemester(id) {
-    if (confirm('Are you sure you want to delete this semester?')) {
+async function deleteSemester(id) {
+    if (!confirm('Are you sure you want to delete this semester?')) return;
+    
+    try {
+        await apiCall(`/semesters/${id}`, 'DELETE');
         semesters = semesters.filter(s => s.id !== id);
         filteredSemesters = filteredSemesters.filter(s => s.id !== id);
         renderSemesters();
         updateStats();
+        alert('Semester deleted successfully');
+    } catch (error) {
+        console.error('Error deleting semester:', error);
+        alert('Failed to delete semester: ' + error.message);
     }
 }
 
-function saveSemester(event) {
+async function saveSemester(event) {
     event.preventDefault();
     
+    // API expects: name, academic_year, semester_type (ODD/EVEN), start_date, end_date, is_active (optional)
     const semesterData = {
-        id: editingSemesterId || Date.now(),
         name: document.getElementById('semesterName').value,
+        academic_year: document.getElementById('academicYear').value,
+        semester_type: document.getElementById('semesterType').value,
         start_date: document.getElementById('startDate').value,
         end_date: document.getElementById('endDate').value,
-        academic_year: document.getElementById('academicYear').value,
         is_active: document.getElementById('isActive').checked
     };
     
-    if (editingSemesterId) {
-        const index = semesters.findIndex(s => s.id === editingSemesterId);
-        if (index !== -1) semesters[index] = semesterData;
-    } else {
-        semesters.push(semesterData);
+    try {
+        if (editingSemesterId) {
+            await apiCall(`/semesters/${editingSemesterId}`, 'PUT', semesterData);
+        } else {
+            await apiCall('/semesters/', 'POST', semesterData);
+        }
+        
+        await loadSemesters();
+        renderSemesters();
+        updateStats();
+        closeModal();
+        alert('Semester saved successfully');
+    } catch (error) {
+        console.error('Error saving semester:', error);
+        alert('Failed to save semester: ' + error.message);
     }
-    
-    filteredSemesters = [...semesters];
-    renderSemesters();
-    updateStats();
-    closeModal();
 }
 
 function closeModal() {

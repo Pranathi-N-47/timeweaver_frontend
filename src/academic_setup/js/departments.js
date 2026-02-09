@@ -1,18 +1,64 @@
-let departments = [
-    { id: 1, code: 'CSE', name: 'Computer Science & Engineering', head: 'Dr. Sarah Johnson' },
-    { id: 2, code: 'ECE', name: 'Electronics & Communication Engineering', head: 'Dr. Michael Chen' },
-    { id: 3, code: 'ME', name: 'Mechanical Engineering', head: 'Dr. Robert Smith' },
-    { id: 4, code: 'CE', name: 'Civil Engineering', head: 'Dr. Emily Davis' },
-    { id: 5, code: 'EEE', name: 'Electrical & Electronics Engineering', head: 'Dr. James Wilson' }
-];
+// API Configuration
+const API_BASE_URL = 'http://localhost:8000/api/v1';
 
-let filteredDepartments = [...departments];
+// State
+let departments = [];
+let filteredDepartments = [];
 let editingDeptId = null;
 
-window.onload = function() {
-    renderDepartments();
-    updateStats();
+// Helper function to get auth token
+function getAuthToken() {
+    return localStorage.getItem('token');
+}
+
+// Helper function to make API calls
+async function apiCall(endpoint, method = 'GET', data = null) {
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+
+    const token = getAuthToken();
+    if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (data) {
+        options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'API request failed');
+    }
+
+    return await response.json();
+}
+
+window.onload = async function() {
+    try {
+        await loadDepartments();
+        renderDepartments();
+        updateStats();
+    } catch (error) {
+        console.error('Error initializing page:', error);
+        alert('Failed to load data: ' + error.message);
+    }
 };
+
+async function loadDepartments() {
+    try {
+        departments = await apiCall('/departments/');
+        filteredDepartments = [...departments];
+    } catch (error) {
+        console.error('Error loading departments:', error);
+        throw error;
+    }
+}
 
 function renderDepartments() {
     const tbody = document.getElementById('departmentsTableBody');
@@ -26,7 +72,7 @@ function renderDepartments() {
         <tr>
             <td><strong>${dept.code}</strong></td>
             <td>${dept.name}</td>
-            <td>${dept.head || '-'}</td>
+            <td>${dept.description || '-'}</td>
             <td class="actions">
                 <button class="btn-edit" onclick="editDepartment(${dept.id})">Edit</button>
                 <button class="btn-danger" onclick="deleteDepartment(${dept.id})">Delete</button>
@@ -44,7 +90,7 @@ function searchDepartments() {
     filteredDepartments = departments.filter(dept => 
         dept.code.toLowerCase().includes(searchTerm) ||
         dept.name.toLowerCase().includes(searchTerm) ||
-        (dept.head && dept.head.toLowerCase().includes(searchTerm))
+        (dept.description && dept.description.toLowerCase().includes(searchTerm))
     );
     renderDepartments();
 }
@@ -65,41 +111,53 @@ function editDepartment(id) {
     document.getElementById('departmentId').value = dept.id;
     document.getElementById('deptCode').value = dept.code;
     document.getElementById('deptName').value = dept.name;
-    document.getElementById('deptHead').value = dept.head || '';
+    document.getElementById('deptHead').value = dept.description || '';
     
     document.getElementById('departmentModal').classList.add('active');
 }
 
-function deleteDepartment(id) {
-    if (confirm('Are you sure you want to delete this department?')) {
+async function deleteDepartment(id) {
+    if (!confirm('Are you sure you want to delete this department?')) return;
+    
+    try {
+        await apiCall(`/departments/${id}`, 'DELETE');
         departments = departments.filter(d => d.id !== id);
         filteredDepartments = filteredDepartments.filter(d => d.id !== id);
         renderDepartments();
         updateStats();
+        alert('Department deleted successfully');
+    } catch (error) {
+        console.error('Error deleting department:', error);
+        alert('Failed to delete department: ' + error.message);
     }
 }
 
-function saveDepartment(event) {
+async function saveDepartment(event) {
     event.preventDefault();
     
+    // API expects: name, code, description (optional)
     const deptData = {
-        id: editingDeptId || Date.now(),
-        code: document.getElementById('deptCode').value,
         name: document.getElementById('deptName').value,
-        head: document.getElementById('deptHead').value
+        code: document.getElementById('deptCode').value,
+        description: document.getElementById('deptHead').value || null  // Using head field as description
     };
     
-    if (editingDeptId) {
-        const index = departments.findIndex(d => d.id === editingDeptId);
-        if (index !== -1) departments[index] = deptData;
-    } else {
-        departments.push(deptData);
+    try {
+        if (editingDeptId) {
+            await apiCall(`/departments/${editingDeptId}`, 'PUT', deptData);
+        } else {
+            await apiCall('/departments/', 'POST', deptData);
+        }
+        
+        await loadDepartments();
+        renderDepartments();
+        updateStats();
+        closeModal();
+        alert('Department saved successfully');
+    } catch (error) {
+        console.error('Error saving department:', error);
+        alert('Failed to save department: ' + error.message);
     }
-    
-    filteredDepartments = [...departments];
-    renderDepartments();
-    updateStats();
-    closeModal();
 }
 
 function closeModal() {
