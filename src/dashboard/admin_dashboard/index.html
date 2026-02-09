@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TimeWeaver Admin | v1.0</title>
+    <title>TimeWeaver Admin | v1.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
@@ -46,34 +46,44 @@
                 <h1 class="font-bold text-xl tracking-tight">TimeWeaver</h1>
             </div>
 
-            <nav class="flex-1 px-4 space-y-2 mt-4">
+            <nav class="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
                 <button onclick="showPage('overview')" id="btn-overview"
                     class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
                     <i class="fa-solid fa-chart-line w-5"></i>
                     <span class="font-medium text-sm">Overview</span>
                 </button>
+                <div class="h-px bg-slate-100 my-2 mx-4"></div>
+
+                <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4">Resources</p>
                 <button onclick="showPage('faculty')" id="btn-faculty"
                     class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
                     <i class="fa-solid fa-id-card-clip w-5"></i>
                     <span class="font-medium text-sm">Faculty Manager</span>
                 </button>
-                <button onclick="showPage('timetable')" id="btn-timetable"
-                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
-                    <i class="fa-solid fa-calendar-check w-5"></i>
-                    <span class="font-medium text-sm">Master Schedule</span>
-                </button>
-                <div class="h-px bg-slate-100 my-2 mx-4"></div>
                 <button onclick="showPage('student')" id="btn-student"
                     class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
                     <i class="fa-solid fa-user-graduate w-5"></i>
                     <span class="font-medium text-sm">Student Manager</span>
+                </button>
+                <button onclick="showPage('rooms')" id="btn-rooms"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-door-open w-5"></i>
+                    <span class="font-medium text-sm">Room Manager</span>
+                </button>
+
+                <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-4">System</p>
+                <button onclick="showPage('timetable')" id="btn-timetable"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-calendar-check w-5"></i>
+                    <span class="font-medium text-sm">Master Schedule</span>
                 </button>
                 <button onclick="showPage('institution')" id="btn-institution"
                     class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all">
                     <i class="fa-solid fa-building-columns w-5"></i>
                     <span class="font-medium text-sm">Institution Rules</span>
                 </button>
-                <div class="mt-auto pt-4">
+
+                <div class="mt-auto pt-4 pb-4">
                     <a href="../login.html"
                         class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-50 transition-all">
                         <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
@@ -100,24 +110,17 @@
                         <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Faculty</p>
                         <p class="text-3xl font-black mt-1" id="stat-faculty-count">0</p>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div
-                            class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-4 text-green-600">
-                            <i class="fa-solid fa-compass-drafting text-xl"></i>
-                        </div>
-                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Utilization</p>
-                        <p class="text-3xl font-black mt-1">84%</p>
-                    </div>
                 </div>
             </div>
 
+            <!-- FACULTY PAGE -->
             <div id="page-faculty" class="page-content p-8 hidden">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-800">Faculty & Workload</h2>
                         <p class="text-slate-500">Assign hours and monitor capacity limits.</p>
                     </div>
-                    <button onclick="toggleModal(true)"
+                    <button onclick="toggleModal('modal-faculty', true)"
                         class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-semibold flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> New Faculty
                     </button>
@@ -129,26 +132,26 @@
                             <tr>
                                 <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Faculty Member</th>
                                 <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Department</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Subject</th>
                                 <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-right">Workload
                                     Progress</th>
                                 <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-center">Actions
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="faculty-list" class="divide-y divide-slate-100">
-                        </tbody>
+                        <tbody id="faculty-list" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- STUDENT MANAGER PAGE -->
+            <!-- STUDENT PAGE -->
             <div id="page-student" class="page-content p-8 hidden">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-800">Student Directory</h2>
                         <p class="text-slate-500">Manage student enrollment and batch details.</p>
                     </div>
-                    <button onclick="toggleStudentModal(true)"
+                    <button onclick="toggleModal('modal-student', true)"
                         class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-semibold flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> New Student
                     </button>
@@ -160,7 +163,9 @@
                             <tr>
                                 <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Student Name</th>
                                 <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Roll No</th>
-                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Batch/Year</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Details (Dept/Batch)
+                                </th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Section</th>
                                 <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-center">Actions
                                 </th>
                             </tr>
@@ -170,41 +175,91 @@
                 </div>
             </div>
 
+            <!-- ROOMS PAGE (NEW) -->
+            <div id="page-rooms" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-slate-800">Room Manager</h2>
+                        <p class="text-slate-500">Configure classrooms, labs, and auditoriums.</p>
+                    </div>
+                    <button onclick="toggleModal('modal-room', true)"
+                        class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> New Room
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50/50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Room Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Type</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Capacity</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase">Features</th>
+                                <th class="px-8 py-4 text-xs font-bold text-slate-400 uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="room-list" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- INSTITUTION PAGE -->
             <div id="page-institution" class="page-content p-8 hidden">
                 <header class="mb-10">
                     <h2 class="text-3xl font-extrabold text-slate-800">Institution Settings</h2>
-                    <p class="text-slate-500 mt-1">Configure global parameters.</p>
+                    <p class="text-slate-500 mt-1">Configure global parameters and scheduling rules.</p>
                 </header>
 
-                <div class="max-w-xl bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Institution Name</label>
-                        <input type="text" id="inst-name"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700"
-                            placeholder="e.g. Gotham University">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Global Settings -->
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6">General Configuration</h3>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Institution
+                                Name</label>
+                            <input type="text" id="inst-name"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700"
+                                placeholder="e.g. Gotham University">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Academic Year</label>
+                            <input type="text" id="inst-year"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700"
+                                placeholder="e.g. 2025-2026">
+                        </div>
+                        <button onclick="saveInstitution()"
+                            class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-indigo-200">Save
+                            Configuration</button>
                     </div>
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Academic Year</label>
-                        <input type="text" id="inst-year"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700"
-                            placeholder="e.g. 2025-2026">
+
+                    <!-- Rule Manager -->
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-slate-800">Scheduling Rules</h3>
+                            <button onclick="toggleModal('modal-rule', true)"
+                                class="text-indigo-600 hover:text-indigo-800 text-sm font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> Add Rule
+                            </button>
+                        </div>
+                        <div id="rule-list" class="max-h-[400px] overflow-y-auto pr-2">
+                            <!-- Rules injected here -->
+                            <p class="text-sm text-slate-400 italic text-center py-4">No rules defined yet.</p>
+                        </div>
                     </div>
-                    <button onclick="saveInstitution()"
-                        class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-indigo-200">Save
-                        Configuration</button>
                 </div>
             </div>
 
+            <!-- TIMETABLE PAGE -->
             <div id="page-timetable" class="page-content p-8 hidden">
                 <div class="flex flex-col gap-6 mb-8">
                     <h2 class="text-3xl font-extrabold text-slate-800">Master Schedule Engine</h2>
 
-                    <!-- Advanced Filter Panel -->
+                    <!-- Filter Panel -->
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h3 class="text-xs font-bold text-red-800 uppercase mb-4 tracking-widest text-center">MAKE YOUR
                             SELECTION</h3>
-
                         <div class="flex flex-wrap items-center justify-center gap-4 mb-6">
                             <div class="flex items-center gap-2">
                                 <select id="tt-year"
@@ -213,7 +268,7 @@
                                     <option value="2026-27">2026-27</option>
                                 </select>
                             </div>
-
+                            <!-- ... other selects ... -->
                             <div class="flex items-center gap-2">
                                 <select id="tt-program"
                                     class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
@@ -221,7 +276,6 @@
                                     <option value="M.Tech">M.Tech.</option>
                                 </select>
                             </div>
-
                             <div class="flex items-center gap-2">
                                 <select id="tt-dept"
                                     class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
@@ -230,7 +284,6 @@
                                     <option value="EE">EE</option>
                                 </select>
                             </div>
-
                             <div class="flex items-center gap-2">
                                 <select id="tt-sem"
                                     class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
@@ -244,7 +297,6 @@
                                     <option value="8">8</option>
                                 </select>
                             </div>
-
                             <div class="flex items-center gap-2">
                                 <select id="tt-sec"
                                     class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 ring-indigo-500">
@@ -254,11 +306,9 @@
                                     <option value="G">G</option>
                                 </select>
                             </div>
-
                             <button onclick="loadTimetable(true)"
-                                class="bg-slate-100 border border-slate-300 text-slate-700 px-6 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-200 transition-colors">
-                                Show Details
-                            </button>
+                                class="bg-slate-100 border border-slate-300 text-slate-700 px-6 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-200 transition-colors">Show
+                                Details</button>
                         </div>
 
                         <div class="flex justify-center gap-4 border-t border-slate-100 pt-6">
@@ -285,8 +335,6 @@
                             <div class="p-5 border-r border-slate-700 text-center">Thursday</div>
                             <div class="p-5 text-center">Friday</div>
                         </div>
-
-
                         <div id="timetable-body"></div>
                     </div>
                 </div>
@@ -294,357 +342,169 @@
         </main>
     </div>
 
-    <div id="modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+    <!-- MODALS -->
+
+    <!-- Faculty Modal -->
+    <div id="modal-faculty" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
             <div class="p-8 border-b border-slate-100">
                 <h3 class="text-xl font-bold">Add Faculty Member</h3>
             </div>
             <div class="p-8 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label>
-                    <input type="text" id="fac-name"
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label><input
+                        type="text" id="fac-name"
                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-indigo-500">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Department</label>
-                        <select id="fac-dept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Department</label><select
+                            id="fac-dept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
                             <option>CS</option>
                             <option>IT</option>
                             <option>EE</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Max Hours</label>
-                        <input type="number" id="fac-max" value="18"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-                    </div>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Role</label><select
+                            id="fac-role" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option>Professor</option>
+                            <option>Assoc. Professor</option>
+                            <option>Lecturer</option>
+                        </select></div>
                 </div>
+                <!-- New Subject Field -->
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Primary Subject</label><input
+                        type="text" id="fac-subject"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                        placeholder="e.g. Data Structures"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Max Hours</label><input
+                        type="number" id="fac-max" value="18"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
             </div>
-            <div class="p-8 bg-slate-50 flex gap-3">
-                <button onclick="toggleModal(false)"
-                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button>
-                <button onclick="saveFaculty()"
-                    class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add to System</button>
-            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-faculty', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveFaculty()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    to System</button></div>
         </div>
     </div>
 
-    <!-- STUDENT MODAL (Relocated) -->
-    <div id="student-modal" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+    <!-- Student Modal -->
+    <div id="modal-student" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
             <div class="p-8 border-b border-slate-100">
                 <h3 class="text-xl font-bold">Add New Student</h3>
             </div>
             <div class="p-8 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label>
-                    <input type="text" id="stu-name"
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label><input
+                        type="text" id="stu-name"
                         class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 ring-indigo-500">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Roll Number</label>
-                        <input type="text" id="stu-roll"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Batch / Year</label>
-                        <input type="text" id="stu-batch"
-                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-                    </div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Roll Number</label><input
+                            type="text" id="stu-roll"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Batch / Year</label><input
+                            type="text" id="stu-batch"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Department</label><select
+                            id="stu-dept" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option>CSE</option>
+                            <option>IT</option>
+                            <option>EE</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Section</label><input
+                            type="text" id="stu-sec"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                            placeholder="e.g. A"></div>
                 </div>
             </div>
-            <div class="p-8 bg-slate-50 flex gap-3">
-                <button onclick="toggleStudentModal(false)"
-                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button>
-                <button onclick="saveStudent()"
-                    class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add Student</button>
-            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-student', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveStudent()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    Student</button></div>
         </div>
     </div>
 
-    <script>
-        // DATA LAYER
-        let facultyData = JSON.parse(localStorage.getItem('timeWeaver_faculty')) || [
-            { id: 1, name: "Dr. Sarah Thorne", dept: "CS", current: 16, max: 18 },
-            { id: 2, name: "Prof. Alan Turing", dept: "CS", current: 12, max: 15 }
-        ];
-
-        let studentData = JSON.parse(localStorage.getItem('timeWeaver_students')) || [];
-        let institutionData = JSON.parse(localStorage.getItem('timeWeaver_institution')) || { name: 'TimeWeaver University', year: '2025-2026' };
-
-        // UI HELPERS
-        function toggleModal(show) {
-            document.getElementById('modal').classList.toggle('hidden', !show);
-        }
-
-        function toggleStudentModal(show) {
-            document.getElementById('student-modal').classList.toggle('hidden', !show);
-        }
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            const btn = document.getElementById(`btn-${pageId}`);
-            if (btn) btn.classList.add('active');
-        }
-
-        // --- FACULTY LOGIC ---
-        function saveFaculty() {
-            const name = document.getElementById('fac-name').value;
-            const dept = document.getElementById('fac-dept').value;
-            const max = parseInt(document.getElementById('fac-max').value);
-
-            if (!name) return alert("Please enter a name");
-
-            facultyData.push({ id: Date.now(), name, dept, current: 0, max });
-            localStorage.setItem('timeWeaver_faculty', JSON.stringify(facultyData));
-
-            toggleModal(false);
-            renderFaculty();
-            updateStats();
-        }
-
-        function deleteFaculty(id) {
-            facultyData = facultyData.filter(f => f.id !== id);
-            localStorage.setItem('timeWeaver_faculty', JSON.stringify(facultyData));
-            renderFaculty();
-            updateStats();
-        }
-
-        function renderFaculty() {
-            const list = document.getElementById('faculty-list');
-            list.innerHTML = facultyData.map(f => {
-                const isOver = f.current > f.max;
-                const percent = Math.min((f.current / f.max) * 100, 100);
-                return `
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="px-8 py-5 font-bold text-slate-700">${f.name}</td>
-                        <td class="px-8 py-5 text-slate-500 text-sm font-medium">${f.dept}</td>
-                        <td class="px-8 py-5">
-                            <div class="flex flex-col items-end">
-                                <span class="text-xs font-black mb-2 ${isOver ? 'text-red-500' : 'text-indigo-600'}">${f.current} / ${f.max} HRS</span>
-                                <div class="w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full ${isOver ? 'bg-red-500' : 'bg-indigo-600'} transition-all duration-1000" style="width: ${percent}%"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-5 text-center">
-                            <button onclick="deleteFaculty(${f.id})" class="text-slate-300 hover:text-red-500 transition-colors">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // --- STUDENT LOGIC ---
-        function saveStudent() {
-            const name = document.getElementById('stu-name').value;
-            const roll = document.getElementById('stu-roll').value;
-            const batch = document.getElementById('stu-batch').value;
-
-            if (!name || !roll) return alert("Please fill all details");
-
-            studentData.push({ id: Date.now(), name, roll, batch });
-            localStorage.setItem('timeWeaver_students', JSON.stringify(studentData));
-
-            toggleStudentModal(false);
-            renderStudents();
-        }
-
-        function deleteStudent(id) {
-            studentData = studentData.filter(s => s.id !== id);
-            localStorage.setItem('timeWeaver_students', JSON.stringify(studentData));
-            renderStudents();
-        }
-
-        function renderStudents() {
-            const list = document.getElementById('student-list');
-            if (!list) return;
-            list.innerHTML = studentData.map(s => `
-                <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="px-8 py-5 font-bold text-slate-700">${s.name}</td>
-                    <td class="px-8 py-5 text-slate-500 text-sm font-medium">${s.roll}</td>
-                    <td class="px-8 py-5 text-slate-500 text-sm font-medium">${s.batch}</td>
-                     <td class="px-8 py-5 text-center">
-                        <button onclick="deleteStudent(${s.id})" class="text-slate-300 hover:text-red-500 transition-colors">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // --- INSTITUTION LOGIC ---
-        function saveInstitution() {
-            const name = document.getElementById('inst-name').value;
-            const year = document.getElementById('inst-year').value;
-            institutionData = { name, year };
-            localStorage.setItem('timeWeaver_institution', JSON.stringify(institutionData));
-            alert("Settings Saved!");
-            document.title = `${name} Admin | v1.0`;
-        }
-
-        function loadInstitution() {
-            if (document.getElementById('inst-name')) {
-                document.getElementById('inst-name').value = institutionData.name || '';
-                document.getElementById('inst-year').value = institutionData.year || '';
-            }
-        }
-
-        function updateStats() {
-            if (document.getElementById('stat-faculty-count')) {
-                document.getElementById('stat-faculty-count').innerText = facultyData.length;
-            }
-        }
-
-        // --- TIMETABLE GENERATION ENGINE ---
-        function getFilterCriteria() {
-            return {
-                year: document.getElementById('tt-year').value,
-                program: document.getElementById('tt-program').value,
-                dept: document.getElementById('tt-dept').value,
-                sem: document.getElementById('tt-sem').value,
-                section: document.getElementById('tt-sec').value
-            };
-        }
-
-        function generateTimetable(mode) {
-            const criteria = getFilterCriteria();
-            const { year, program, dept, sem, section } = criteria;
-
-            if (!confirm(`Are you sure you want to ${mode} the schedule for ${program} ${dept} Sem-${sem} Sec-${section}? This will overwrite existing entries.`)) return;
-
-            // Load existing data
-            let allTimetableData = JSON.parse(localStorage.getItem('timeWeaver_timetable')) || [];
-
-            // Remove existing entries for this specific criteria if regenerating
-            allTimetableData = allTimetableData.filter(t =>
-                !(t.dept === dept && t.sem === sem && t.section === section)
-            );
-
-            const times = ["09:00", "10:00", "11:00", "12:00", "01:00", "02:00", "03:00"];
-            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-            const subjects = ["Data Structures", "Algorithms", "Database Systems", "OS", "Networks", "AI/ML", "Cloud Computing"];
-
-            // Generate new entries
-            days.forEach(day => {
-                times.forEach(time => {
-                    // Randomly decide if a class exists (e.g., 80% chance)
-                    if (Math.random() > 0.2) {
-                        const randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
-                        // Filter faculty by department availability (simple logic)
-                        const deptFaculty = facultyData.filter(f => f.dept === dept);
-                        const assignedFaculty = deptFaculty.length > 0
-                            ? deptFaculty[Math.floor(Math.random() * deptFaculty.length)].name
-                            : "TBA";
-
-                        allTimetableData.push({
-                            id: Date.now() + Math.random(),
-                            day: day,
-                            time: time,
-                            subject: randomSubject,
-                            faculty: assignedFaculty,
-                            room: "R-" + (100 + parseInt(sem) * 10 + Math.floor(Math.random() * 5)),
-                            // Meta tags
-                            dept: dept,
-                            sem: sem,
-                            section: section,
-                            program: program,
-                            year: year
-                        });
-                    }
-                });
-            });
-
-            localStorage.setItem('timeWeaver_timetable', JSON.stringify(allTimetableData));
-            alert("Timetable Generated Successfully!");
-            loadTimetable(true);
-        }
-
-        function loadTimetable(isFiltered = false) {
-            // Updated Times Slots to match provided Real Data
-            const times = [
-                "08:00 - 08:50", "08:50 - 09:40", "09:40 - 10:30",
-                "10:45 - 11:35", "11:35 - 12:25", "12:25 - 01:15",
-                "02:05 - 02:55", "02:55 - 03:45", "03:45 - 04:35",
-                "04:35 - 05:25", "05:25 - 06:15"
-            ];
-            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
-            let allData = JSON.parse(localStorage.getItem('timeWeaver_timetable'));
-
-            // Seed initial data if empty (Older logic fallback)
-            if (!allData || allData.length === 0) {
-                // We rely on "Generate" now, but let's keep array valid
-                allData = [];
-            }
-
-            // FILTER LOGIC
-            let displayData = allData;
-            if (isFiltered) {
-                const criteria = getFilterCriteria();
-                displayData = allData.filter(t =>
-                    t.dept === criteria.dept &&
-                    t.sem === criteria.sem &&
-                    t.section === criteria.section
-                );
-            } else {
-                // By default show nothing or show a hint? 
-                // Let's filter by the DEFAULT dropdown values initially
-                const criteria = getFilterCriteria(); // will take default selected values from DOM
-                displayData = allData.filter(t =>
-                    (t.dept === criteria.dept && t.sem === criteria.sem && t.section === criteria.section) ||
-                    (!t.section) // Backwards compatibility for mock data without tags
-                );
-            }
-
-            const body = document.getElementById('timetable-body');
-            body.innerHTML = times.map(time => `
-                <div class="timetable-grid border-b border-slate-100">
-                    <div class="p-6 border-r border-slate-100 text-xs font-black text-slate-300 flex items-center justify-center">${time}</div>
-                    ${days.map(day => {
-                // Find class for this day/time in the filtered set
-                const classSession = displayData.find(t => t.day === day && t.time === time);
-
-                return `
-                            <div class="p-3 border-r border-slate-50 h-32 transition-colors hover:bg-slate-50/30">
-                                ${classSession ? `
-                                    <div class="bg-white border border-slate-200 p-4 rounded-2xl h-full shadow-sm flex flex-col justify-between group hover:border-indigo-200 hover:shadow-md transition-all">
-                                        <div>
-                                            <p class="text-[9px] font-black text-indigo-500 tracking-tighter uppercase mb-1">Lecture</p>
-                                            <p class="text-[13px] font-extrabold text-slate-800 leading-tight">${classSession.subject}</p>
-                                            <p class="text-[10px] text-slate-500 mt-1 font-semibold">${classSession.faculty}</p>
-                                        </div>
-                                        <div class="flex justify-between items-end">
-                                            <span class="text-[10px] text-slate-400 font-bold">${classSession.room}</span>
-                                            <i class="fa-solid fa-circle-check text-green-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
-            }).join('')}
+    <!-- Room Modal -->
+    <div id="modal-room" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100">
+                <h3 class="text-xl font-bold">Add New Room</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Building</label><input
+                            type="text" id="room-building"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Room No</label><input
+                            type="text" id="room-number"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
                 </div>
-            `).join('');
-        }
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Type</label><select
+                            id="room-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option value="classroom">Classroom</option>
+                            <option value="lab">Lab</option>
+                            <option value="auditorium">Auditorium</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Capacity</label><input
+                            type="number" id="room-capacity"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                </div>
+                <div class="flex gap-4 pt-2">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input type="checkbox"
+                            id="room-projector" class="w-4 h-4 text-indigo-600 rounded"> Projector</label>
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input type="checkbox"
+                            id="room-lab" class="w-4 h-4 text-indigo-600 rounded"> Lab Equip</label>
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input type="checkbox"
+                            id="room-ac" class="w-4 h-4 text-indigo-600 rounded"> A/C</label>
+                </div>
+            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-room', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveRoom()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    Room</button></div>
+        </div>
+    </div>
 
-        window.onload = () => {
-            // Init dropdowns if needed
-            // ...
+    <!-- Rule Modal -->
+    <div id="modal-rule" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100">
+                <h3 class="text-xl font-bold">Add Constraint Rule</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Rule Name</label><input
+                        type="text" id="rule-name"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                        placeholder="e.g. No Morning Classes"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Description</label><textarea
+                        id="rule-desc" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"
+                        rows="2"></textarea></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Type</label><select
+                            id="rule-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                            <option value="TIME_WINDOW">Time Window</option>
+                            <option value="CAPACITY">Capacity Check</option>
+                            <option value="GAP">Gap Constraint</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Weight</label><input
+                            type="number" id="rule-weight" value="1.0" step="0.1"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3"></div>
+                </div>
+                <div class="pt-2"><label class="flex items-center gap-2 text-sm font-semibold text-slate-600"><input
+                            type="checkbox" id="rule-hard" checked class="w-4 h-4 text-red-600 rounded"> Hard Constraint
+                        (Required)</label></div>
+            </div>
+            <div class="p-8 bg-slate-50 flex gap-3"><button onclick="toggleModal('modal-rule', false)"
+                    class="flex-1 px-4 py-3 font-bold text-slate-500 hover:text-slate-700">Cancel</button><button
+                    onclick="saveRule()" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold">Add
+                    Rule</button></div>
+        </div>
+    </div>
 
-            renderFaculty();
-            renderStudents();
-            loadInstitution();
-            loadTimetable(false); // Load defaults
-            updateStats();
-            showPage('overview');
-        };
-    </script>
+    <!-- SCRIPTS -->
+    <script src="app.js"></script>
+
 </body>
 
 </html>
