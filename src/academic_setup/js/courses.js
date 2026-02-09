@@ -100,7 +100,7 @@ function renderCourses() {
     const tbody = document.getElementById('coursesTableBody');
     
     if (filteredCourses.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No courses found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No courses found</td></tr>';
         return;
     }
     
@@ -122,6 +122,7 @@ function renderCourses() {
             </td>
             <td>${course.theory_hours || 0}</td>
             <td>${course.lab_hours || 0}</td>
+            <td>${course.tutorial_hours || 0}</td>
             <td class="actions">
                 <button class="btn-edit" onclick="editCourse(${course.id})">Edit</button>
                 <button class="btn-danger" onclick="deleteCourse(${course.id})">Delete</button>
@@ -198,6 +199,7 @@ function editCourse(id) {
     document.getElementById('courseDescription').value = course.description || '';
     document.getElementById('theoryHours').value = course.theory_hours || 0;
     document.getElementById('labHours').value = course.lab_hours || 0;
+    document.getElementById('tutorialHours').value = course.tutorial_hours || 0;
     document.getElementById('isElective').checked = course.is_elective || false;
     document.getElementById('requiresLab').checked = course.requires_lab || false;
     
@@ -235,7 +237,7 @@ async function saveCourse(event) {
         department_id: deptId,
         theory_hours: parseInt(document.getElementById('theoryHours').value) || 0,
         lab_hours: parseInt(document.getElementById('labHours').value) || 0,
-        tutorial_hours: 0,
+        tutorial_hours: parseInt(document.getElementById('tutorialHours').value) || 0,
         is_elective: document.getElementById('isElective').checked,
         requires_lab: document.getElementById('requiresLab').checked
     };

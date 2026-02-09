@@ -99,12 +99,13 @@
                         <th>Lab</th>
                         <th>Theory Hrs</th>
                         <th>Lab Hrs</th>
+                        <th>Tutorial Hrs</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="coursesTableBody">
                     <tr>
-                        <td colspan="9" class="loading">Loading courses...</td>
+                        <td colspan="10" class="loading">Loading courses...</td>
                     </tr>
                 </tbody>
             </table>
@@ -157,6 +158,11 @@
                     <div class="form-group">
                         <label for="labHours">Lab Hours per Week</label>
                         <input type="number" id="labHours" min="0" max="20" placeholder="e.g., 2">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tutorialHours">Tutorial Hours per Week</label>
+                        <input type="number" id="tutorialHours" min="0" max="20" placeholder="e.g., 1">
                     </div>
 
                     <div class="checkbox-group">
