@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semesters Management - TimeWeaver</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">⏱</div>
+            <h1>TimeWeaver</h1>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="courses.html" class="menu-item">📚 Courses</a></li>
+            <li><a href="departments.html" class="menu-item">🏢 Departments</a></li>
+            <li><a href="semesters.html" class="menu-item active">📅 Semesters</a></li>
+            <li><a href="sections.html" class="menu-item">👥 Sections</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../index.html" class="logout-btn">🏠 Home</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Semesters Management</h1>
+                <p class="page-subtitle">Manage academic semesters and terms</p>
+            </div>
+            <button class="btn-primary" onclick="openAddModal()">+ Add New Semester</button>
+        </div>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSemesters">0</div>
+                <div class="stat-label">Total Semesters</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search semesters..." onkeyup="searchSemesters()">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Academic Year</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="semestersTableBody">
+                    <tr><td colspan="6" class="loading">Loading semesters...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="semesterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Semester</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="semesterForm" onsubmit="saveSemester(event)">
+                    <input type="hidden" id="semesterId">
+                    
+                    <div class="form-group">
+                        <label for="semesterName">Semester Name <span class="required">*</span></label>
+                        <input type="text" id="semesterName" required placeholder="e.g., Fall 2024">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="startDate">Start Date <span class="required">*</span></label>
+                        <input type="date" id="startDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="endDate">End Date <span class="required">*</span></label>
+                        <input type="date" id="endDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="academicYear">Academic Year <span class="required">*</span></label>
+                        <input type="text" id="academicYear" required placeholder="e.g., 2024-2025">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isActive">
+                        <label for="isActive">Active Semester</label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Semester</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/semesters.js"></script>
+</body>
+</html>
