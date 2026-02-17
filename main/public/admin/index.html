@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeWeaver Admin | v1.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/theme-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(179, 25, 25, 0.1);
+            color: var(--primary);
+            border-right: 4px solid var(--primary);
+        }
+
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: 100px repeat(5, 1fr);
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body class="bg-main text-text-main transition-colors duration-300">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside
+            class="w-64 bg-card border-r border-border-color flex flex-col hidden md:flex transition-colors duration-300">
+            <div class="p-6 flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/50">
+                    <i class="fa-solid fa-clock-rotate-left text-white text-xl"></i>
+                </div>
+                <h1 class="font-bold text-xl tracking-tight text-text-main neon-text">TimeWeaver</h1>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
+                <button onclick="showPage('overview')" id="btn-overview"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span class="font-medium text-sm">Overview</span>
+                </button>
+                <div class="h-px bg-border-color my-2 mx-4"></div>
+
+                <p class="px-4 text-xs font-bold text-text-muted uppercase tracking-wider mb-2 mt-4">Resources</p>
+                <button onclick="showPage('faculty')" id="btn-faculty"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-id-card-clip w-5"></i>
+                    <span class="font-medium text-sm">Faculty Manager</span>
+                </button>
+                <button onclick="showPage('student')" id="btn-student"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-user-graduate w-5"></i>
+                    <span class="font-medium text-sm">Student Manager</span>
+                </button>
+                <button onclick="showPage('rooms')" id="btn-rooms"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-door-open w-5"></i>
+                    <span class="font-medium text-sm">Room Manager</span>
+                </button>
+                <div class="h-px bg-border-color my-2 mx-4"></div>
+
+                <p class="px-4 text-xs font-bold text-text-muted uppercase tracking-wider mb-2 mt-4">Academic Setup</p>
+                <button onclick="showPage('departments')" id="btn-departments"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-building w-5"></i>
+                    <span class="font-medium text-sm">Departments</span>
+                </button>
+                <button onclick="showPage('courses')" id="btn-courses"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-book w-5"></i>
+                    <span class="font-medium text-sm">Courses</span>
+                </button>
+                <button onclick="showPage('semesters')" id="btn-semesters"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-calendar-days w-5"></i>
+                    <span class="font-medium text-sm">Semesters</span>
+                </button>
+                <button onclick="showPage('sections')" id="btn-sections"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-users w-5"></i>
+                    <span class="font-medium text-sm">Sections</span>
+                </button>
+                <div class="h-px bg-border-color my-2 mx-4"></div>
+
+                <button onclick="showPage('conflicts')" id="btn-conflicts"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-triangle-exclamation w-5"></i>
+                    <span class="font-medium text-sm">Conflict Monitor</span>
+                </button>
+
+                <p class="px-4 text-xs font-bold text-text-muted uppercase tracking-wider mb-2 mt-4">System</p>
+                <button onclick="showPage('timetable')" id="btn-timetable"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-calendar-check w-5"></i>
+                    <span class="font-medium text-sm">Master Schedule</span>
+                </button>
+                <button onclick="showPage('institution')" id="btn-institution"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-building-columns w-5"></i>
+                    <span class="font-medium text-sm">Institution Rules</span>
+                </button>
+
+                <div class="mt-auto pt-4 pb-4">
+                    <button id="theme-toggle" onclick="toggleTheme()"
+                        class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all mb-2">
+                        <i class="fa-solid fa-moon w-5"></i>
+                        <span class="font-medium text-sm">Toggle Theme</span>
+                    </button>
+                    <a href="../login.html"
+                        class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-all">
+                        <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                        <span class="font-medium text-sm">Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto relative">
+
+
+            <div id="page-overview" class="page-content p-8">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-text-main">System Dashboard</h2>
+                    <p class="text-text-muted mt-1">Real-time institutional resource monitoring.</p>
+                </header>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-models bg-card p-6 rounded-2xl border border-border-color shadow-sm glass-panel">
+                        <div
+                            class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4 text-blue-400">
+                            <i class="fa-solid fa-user-tie text-xl"></i>
+                        </div>
+                        <p class="text-text-muted text-xs font-bold uppercase tracking-wider">Total Faculty</p>
+                        <p class="text-3xl font-black mt-1 text-text-main" id="stat-faculty-count">0</p>
+                    </div>
+
+                    <!-- Total Students -->
+                    <div class="bg-models bg-card p-6 rounded-2xl border border-border-color shadow-sm glass-panel">
+                        <div
+                            class="w-12 h-12 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4 text-cyan-400">
+                            <i class="fa-solid fa-users text-xl"></i>
+                        </div>
+                        <p class="text-text-muted text-xs font-bold uppercase tracking-wider">Total Students</p>
+                        <p class="text-3xl font-black mt-1 text-text-main" id="stat-student-count">0</p>
+                    </div>
+
+                    <!-- Critical Conflicts -->
+                    <div class="bg-models bg-card p-6 rounded-2xl border border-border-color shadow-sm glass-panel">
+                        <div
+                            class="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center mb-4 text-red-500">
+                            <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                        </div>
+                        <p class="text-text-muted text-xs font-bold uppercase tracking-wider">Critical Conflicts</p>
+                        <p class="text-3xl font-black mt-1 text-text-main" id="stat-critical-conflicts">0</p>
+                    </div>
+
+                    <!-- Pending Leaves -->
+                    <div class="bg-models bg-card p-6 rounded-2xl border border-border-color shadow-sm glass-panel">
+                        <div
+                            class="w-12 h-12 bg-fuchsia-500/10 rounded-lg flex items-center justify-center mb-4 text-fuchsia-500">
+                            <i class="fa-solid fa-clipboard-question text-xl"></i>
+                        </div>
+                        <p class="text-text-muted text-xs font-bold uppercase tracking-wider">Pending Leaves</p>
+                        <p class="text-3xl font-black mt-1 text-text-main" id="stat-pending-leaves">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FACULTY PAGE -->
+            <div id="page-faculty" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">Faculty & Workload</h2>
+                        <p class="text-text-muted">Assign hours and monitor capacity limits.</p>
+                    </div>
+                    <button onclick="toggleModal('modal-faculty', true)"
+                        class="bg-red-700 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-900/20 font-semibold flex items-center gap-2 neon-border">
+                        <i class="fa-solid fa-plus"></i> New Faculty
+                    </button>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-main border-b border-border-color">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Faculty Member</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Department</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Subject</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-right">Workload
+                                    Progress</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="faculty-list" class="divide-y divide-border-color"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- STUDENT PAGE -->
+            <div id="page-student" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">Student Directory</h2>
+                        <p class="text-text-muted">Manage student enrollment and batch details.</p>
+                    </div>
+                    <button onclick="toggleModal('modal-student', true)"
+                        class="bg-red-700 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-900/20 font-semibold flex items-center gap-2 neon-border">
+                        <i class="fa-solid fa-plus"></i> New Student
+                    </button>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-main border-b border-border-color">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Student Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Roll No</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Details (Dept/Batch)
+                                </th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Section</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-list" class="divide-y divide-border-color"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ROOMS PAGE -->
+            <div id="page-rooms" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">Room Manager</h2>
+                        <p class="text-text-muted">Configure classrooms, labs, and auditoriums.</p>
+                    </div>
+                    <button onclick="toggleModal('modal-room', true)"
+                        class="bg-red-700 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-900/20 font-semibold flex items-center gap-2 neon-border">
+                        <i class="fa-solid fa-plus"></i> New Room
+                    </button>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-main border-b border-border-color">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Room Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Type</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Capacity</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Features</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="room-list" class="divide-y divide-border-color"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CONFLICTS PAGE -->
+            <div id="page-conflicts" class="page-content p-8 hidden">
+                <header class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main mb-1">Conflict Monitor</h2>
+                        <p class="text-text-muted">Real-time scheduling conflict detection and resolution.</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button
+                            class="bg-card border border-border-color text-text-muted px-4 py-2 rounded-lg text-sm font-bold hover:bg-main shadow-sm flex items-center gap-2"
+                            onclick="renderConflicts()">
+                            <i class="fa-solid fa-rotate"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div
+                        class="bg-card p-6 rounded-2xl border border-border-color shadow-sm relative overflow-hidden group hover:border-red-500/50 transition-all">
+                        <div
+                            class="absolute right-0 top-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fa-solid fa-bolt text-6xl text-red-600"></i>
+                        </div>
+                        <h3 class="text-text-muted text-xs font-bold uppercase tracking-wider mb-2">Critical Conflicts
+                        </h3>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-text-main" id="stat-critical">0</span>
+                            <span
+                                class="text-xs text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full flex items-center gap-1 font-bold">
+                                <i class="fa-solid fa-arrow-up"></i> Action Reqd
+                            </span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-card p-6 rounded-2xl border border-border-color shadow-sm relative overflow-hidden group hover:border-amber-500/50 transition-all">
+                        <div
+                            class="absolute right-0 top-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fa-solid fa-triangle-exclamation text-6xl text-amber-500"></i>
+                        </div>
+                        <h3 class="text-text-muted text-xs font-bold uppercase tracking-wider mb-2">Warnings</h3>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-text-main" id="stat-warnings">0</span>
+                            <span
+                                class="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full font-bold">Review</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-card p-6 rounded-2xl border border-border-color shadow-sm relative overflow-hidden group hover:border-green-500/50 transition-all">
+                        <div
+                            class="absolute right-0 top-0 p-6 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fa-solid fa-check-circle text-6xl text-green-500"></i>
+                        </div>
+                        <h3 class="text-text-muted text-xs font-bold uppercase tracking-wider mb-2">Resolved</h3>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-text-main" id="stat-resolved">0</span>
+                            <span
+                                class="text-xs text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full font-bold">Total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden p-6">
+                    <h3 class="font-bold text-lg mb-4 text-text-main">Detected Issues</h3>
+                    <div class="space-y-4" id="conflicts-container">
+                        <div class="flex items-center justify-center p-12 text-text-muted">
+                            <i class="fa-solid fa-spinner fa-spin mr-3"></i> Loading conflicts...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INSTITUTION PAGE -->
+            <div id="page-institution" class="page-content p-8 hidden">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-text-main">Institution Settings</h2>
+                    <p class="text-text-muted mt-1">Configure global parameters and scheduling rules.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Global Settings -->
+                    <div class="bg-card p-8 rounded-2xl border border-border-color shadow-sm h-fit">
+                        <h3 class="text-lg font-bold text-text-main mb-6">General Configuration</h3>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-text-muted uppercase mb-2">Institution
+                                Name</label>
+                            <input type="text" id="inst-name"
+                                class="w-full bg-main border border-border-color rounded-xl px-4 py-3 font-bold text-text-main placeholder-text-muted focus:border-red-500 focus:outline-none"
+                                placeholder="e.g. Gotham University">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-text-muted uppercase mb-2">Academic Year</label>
+                            <input type="text" id="inst-year"
+                                class="w-full bg-main border border-border-color rounded-xl px-4 py-3 font-bold text-text-main placeholder-text-muted focus:border-red-500 focus:outline-none"
+                                placeholder="e.g. 2025-2026">
+                        </div>
+                        <button onclick="saveInstitution()"
+                            class="w-full bg-red-700 text-white py-3 rounded-xl font-bold shadow-lg shadow-red-900/40 hover:bg-red-600 transition-all neon-border">Save
+                            Configuration</button>
+                    </div>
+
+                    <!-- Rule Manager -->
+                    <div class="bg-card p-8 rounded-2xl border border-border-color shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-text-main">Scheduling Rules</h3>
+                            <button onclick="toggleModal('modal-rule', true)"
+                                class="text-red-400 hover:text-red-300 text-sm font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> Add Rule
+                            </button>
+                        </div>
+                        <div id="rule-list" class="max-h-[400px] overflow-y-auto pr-2">
+                            <!-- Rules injected here -->
+                            <p class="text-sm text-text-muted italic text-center py-4">No rules defined yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIMETABLE PAGE -->
+            <div id="page-timetable" class="page-content p-8 hidden">
+                <div class="flex flex-col gap-6 mb-8">
+                    <h2 class="text-3xl font-extrabold text-text-main">Master Schedule Engine</h2>
+
+                    <!-- Filter Panel -->
+                    <div class="bg-card p-6 rounded-2xl border border-border-color shadow-sm">
+                        <h3 class="text-xs font-bold text-red-400 uppercase mb-4 tracking-widest text-center neon-text">
+                            MAKE YOUR SELECTION</h3>
+                        <div class="flex flex-wrap items-center justify-center gap-4 mb-6">
+                            <div class="flex items-center gap-2">
+                                <select id="tt-year"
+                                    class="bg-main border border-border-color rounded-lg px-3 py-2 text-sm font-bold text-text-main outline-none focus:ring-1 ring-red-500">
+                                    <option value="2025-26">2025-26</option>
+                                    <option value="2026-27">2026-27</option>
+                                </select>
+                            </div>
+                            <!-- ... other selects ... -->
+                            <div class="flex items-center gap-2">
+                                <select id="tt-program"
+                                    class="bg-main border border-border-color rounded-lg px-3 py-2 text-sm font-bold text-text-main outline-none focus:ring-1 ring-cyan-500">
+                                    <option value="B.Tech">B.Tech.</option>
+                                    <option value="M.Tech">M.Tech.</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="tt-dept"
+                                    class="bg-main border border-border-color rounded-lg px-3 py-2 text-sm font-bold text-text-main outline-none focus:ring-1 ring-cyan-500">
+                                    <option value="CSE">CSE</option>
+                                    <option value="IT">IT</option>
+                                    <option value="EE">EE</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="tt-sem"
+                                    class="bg-main border border-border-color rounded-lg px-3 py-2 text-sm font-bold text-text-main outline-none focus:ring-1 ring-cyan-500">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6" selected>6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="tt-sec"
+                                    class="bg-main border border-border-color rounded-lg px-3 py-2 text-sm font-bold text-text-main outline-none focus:ring-1 ring-cyan-500">
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="G">G</option>
+                                </select>
+                            </div>
+                            <button onclick="loadTimetable(true)"
+                                class="bg-card border border-border-color text-text-muted px-6 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-main transition-colors">Show
+                                Details</button>
+                        </div>
+
+                        <div class="flex justify-center gap-4 border-t border-border-color pt-6">
+                            <button onclick="generateTimetable('generate')"
+                                class="bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-red-900/40 hover:bg-red-600 transition-all flex items-center gap-2 neon-border">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate New
+                            </button>
+                            <button onclick="generateTimetable('regenerate')"
+                                class="bg-card border border-red-500/30 text-red-400 px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-red-500/10 transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-rotate"></i> Regenerate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-xl overflow-x-auto">
+                    <div class="min-w-[1000px]">
+                        <div
+                            class="timetable-grid bg-main text-red-400 font-bold text-[11px] uppercase tracking-widest border-b border-border-color">
+                            <div class="p-5 border-r border-border-color">Hour</div>
+                            <div class="p-5 border-r border-border-color text-center">Monday</div>
+                            <div class="p-5 border-r border-border-color text-center">Tuesday</div>
+                            <div class="p-5 border-r border-border-color text-center">Wednesday</div>
+                            <div class="p-5 border-r border-border-color text-center">Thursday</div>
+                            <div class="p-5 text-center">Friday</div>
+                        </div>
+                        <div id="timetable-body"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEPARTMENTS PAGE -->
+            <div id="page-departments" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">Departments Management</h2>
+                        <p class="text-text-muted">Manage academic departments</p>
+                    </div>
+                    <button onclick="toggleModal('modal-department', true)"
+                        class="bg-red-700 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-900/20 font-semibold flex items-center gap-2 neon-border">
+                        <i class="fa-solid fa-plus"></i> New Department
+                    </button>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-main border-b border-border-color">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Code</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Department Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Description</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="departments-list" class="divide-y divide-border-color"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- COURSES PAGE -->
+            <div id="page-courses" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">Courses Management</h2>
+                        <p class="text-text-muted">Manage academic courses and subjects</p>
+                    </div>
+                    <button onclick="toggleModal('modal-course', true)"
+                        class="bg-red-700 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-900/20 font-semibold flex items-center gap-2 neon-border">
+                        <i class="fa-solid fa-plus"></i> New Course
+                    </button>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-main border-b border-border-color">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Code</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Course Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Credits</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Hours (T/L/Tu)</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Department</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="courses-list" class="divide-y divide-border-color"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SEMESTERS PAGE -->
+            <div id="page-semesters" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">Semesters Management</h2>
+                        <p class="text-text-muted">Configure academic semesters and terms</p>
+                    </div>
+                    <button onclick="toggleModal('modal-semester', true)"
+                        class="bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-500 transition-all shadow-lg shadow-red-900/20 font-semibold flex items-center gap-2 neon-border">
+                        <i class="fa-solid fa-plus"></i> New Semester
+                    </button>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-main border-b border-border-color">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Year</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Semester</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Start Date</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">End Date</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Status
+                                </th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="semesters-list" class="divide-y divide-border-color"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTIONS PAGE -->
+            <div id="page-sections" class="page-content p-8 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">Sections Management</h2>
+                        <p class="text-text-muted">Organize class sections and batches</p>
+                    </div>
+                    <button onclick="toggleModal('modal-section', true)"
+                        class="bg-red-700 text-white px-6 py-3 rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-900/20 font-semibold flex items-center gap-2 neon-border">
+                        <i class="fa-solid fa-plus"></i> New Section
+                    </button>
+                </div>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-main border-b border-border-color">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Section Name</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Department</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Batch Years</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase">Student Count</th>
+                                <th class="px-8 py-4 text-xs font-bold text-text-muted uppercase text-center">Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="sections-list" class="divide-y divide-border-color"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- (Retaining existing modal structures but with updated classes) -->
+
+    <!-- Faculty Modal -->
+    <div id="modal-faculty" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add Faculty Member</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Full Name</label><input
+                        type="text" id="fac-name"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 outline-none focus:ring-1 ring-red-500 text-text-main">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Department</label><select
+                            id="fac-dept"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                            <option>CS</option>
+                            <option>IT</option>
+                            <option>EE</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Role</label><select
+                            id="fac-role"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                            <option>Professor</option>
+                            <option>Assoc. Professor</option>
+                            <option>Lecturer</option>
+                        </select></div>
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Date of Birth
+                        (Password)</label><input type="date" id="fac-dob"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Primary Subject</label><input
+                        type="text" id="fac-subject"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        placeholder="e.g. Data Structures"></div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Max Hours</label><input
+                        type="number" id="fac-max" value="18"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+            </div>
+            <div class="p-8 bg-main flex gap-3"><button onclick="toggleModal('modal-faculty', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button><button
+                    onclick="saveFaculty()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    to System</button></div>
+        </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div id="modal-student" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add New Student</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Full Name</label><input
+                        type="text" id="stu-name"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 outline-none focus:ring-1 ring-red-500 text-text-main">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Roll Number</label><input
+                            type="text" id="stu-roll"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Batch /
+                            Year</label><input type="text" id="stu-batch"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Department</label><select
+                            id="stu-dept"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                            <option>CSE</option>
+                            <option>IT</option>
+                            <option>EE</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Section</label><input
+                            type="text" id="stu-sec"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            placeholder="e.g. A"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Date of Birth
+                        (Password)</label><input type="date" id="stu-dob"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+            </div>
+            <div class="p-8 bg-main flex gap-3"><button onclick="toggleModal('modal-student', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button><button
+                    onclick="saveStudent()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    Student</button></div>
+        </div>
+    </div>
+
+    <!-- Room Modal -->
+    <div id="modal-room" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add New Room</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Building</label><input
+                            type="text" id="room-building"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Room No</label><input
+                            type="text" id="room-number"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Type</label><select
+                            id="room-type"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                            <option value="classroom">Classroom</option>
+                            <option value="lab">Lab</option>
+                            <option value="auditorium">Auditorium</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Capacity</label><input
+                            type="number" id="room-capacity"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+                </div>
+                <div class="flex gap-4 pt-2">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-text-muted"><input type="checkbox"
+                            id="room-projector"
+                            class="w-4 h-4 text-red-600 rounded focus:ring-red-500 bg-main border-border-color">
+                        Projector</label>
+                    <label class="flex items-center gap-2 text-sm font-semibold text-text-muted"><input type="checkbox"
+                            id="room-lab"
+                            class="w-4 h-4 text-red-600 rounded focus:ring-red-500 bg-main border-border-color"> Lab
+                        Equip</label>
+                    <label class="flex items-center gap-2 text-sm font-semibold text-text-muted"><input type="checkbox"
+                            id="room-ac"
+                            class="w-4 h-4 text-red-600 rounded focus:ring-red-500 bg-main border-border-color">
+                        A/C</label>
+                </div>
+            </div>
+            <div class="p-8 bg-main flex gap-3"><button onclick="toggleModal('modal-room', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button><button
+                    onclick="saveRoom()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    Room</button></div>
+        </div>
+    </div>
+
+    <!-- Rule Modal -->
+    <div id="modal-rule" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add Constraint Rule</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Rule Name</label><input
+                        type="text" id="rule-name"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        placeholder="e.g. No Morning Classes"></div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Description</label><textarea
+                        id="rule-desc"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        rows="2"></textarea></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Type</label><select
+                            id="rule-type"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                            <option value="TIME_WINDOW">Time Window</option>
+                            <option value="CAPACITY">Capacity Check</option>
+                            <option value="GAP">Gap Constraint</option>
+                        </select></div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Weight</label><input
+                            type="number" id="rule-weight" value="1.0" step="0.1"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"></div>
+                </div>
+                <div class="pt-2"><label class="flex items-center gap-2 text-sm font-semibold text-text-muted"><input
+                            type="checkbox" id="rule-hard" checked
+                            class="w-4 h-4 text-red-500 rounded bg-main border-border-color"> Hard Constraint
+                        (Required)</label></div>
+            </div>
+            <div class="p-8 bg-main flex gap-3"><button onclick="toggleModal('modal-rule', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button><button
+                    onclick="saveRule()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    Rule</button></div>
+        </div>
+    </div>
+
+    <!-- Department Modal -->
+    <div id="modal-department" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add Department</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Department Code</label>
+                    <input type="text" id="dept-code"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        placeholder="e.g. CSE">
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Department Name</label>
+                    <input type="text" id="dept-name"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        placeholder="e.g. Computer Science">
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Description</label>
+                    <textarea id="dept-desc"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        rows="2"></textarea>
+                </div>
+            </div>
+            <div class="p-8 bg-main flex gap-3">
+                <button onclick="toggleModal('modal-department', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button>
+                <button onclick="saveDepartment()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    Department</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Modal -->
+    <div id="modal-course" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-2xl rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add Course</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Course Code</label>
+                        <input type="text" id="course-code"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            placeholder="e.g. CS301">
+                    </div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Credits</label>
+                        <input type="number" id="course-credits"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            placeholder="4">
+                    </div>
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Course Name</label>
+                    <input type="text" id="course-name"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        placeholder="e.g. Data Structures">
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Theory Hours</label>
+                        <input type="number" id="course-theory"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            value="0">
+                    </div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Lab Hours</label>
+                        <input type="number" id="course-lab"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            value="0">
+                    </div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Tutorial Hours</label>
+                        <input type="number" id="course-tutorial"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            value="0">
+                    </div>
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Department</label>
+                    <select id="course-dept"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-text-muted">
+                        <input type="checkbox" id="course-lab-required"
+                            class="w-4 h-4 text-red-600 rounded focus:ring-red-500 bg-main border-border-color">
+                        Requires Lab
+                    </label>
+                </div>
+            </div>
+            <div class="p-8 bg-main flex gap-3">
+                <button onclick="toggleModal('modal-course', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button>
+                <button onclick="saveCourse()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    Course</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Semester Modal -->
+    <div id="modal-semester" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add Semester</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Year</label>
+                        <input type="number" id="sem-year"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            placeholder="2024">
+                    </div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Semester Number</label>
+                        <select id="sem-number"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                            <option value="1">Semester 1 (Fall)</option>
+                            <option value="2">Semester 2 (Spring)</option>
+                        </select>
+                    </div>
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Start Date</label>
+                    <input type="date" id="sem-start"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">End Date</label>
+                    <input type="date" id="sem-end"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                </div>
+            </div>
+            <div class="p-8 bg-main flex gap-3">
+                <button onclick="toggleModal('modal-semester', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button>
+                <button onclick="saveSemester()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    Semester</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Modal -->
+    <div id="modal-section" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border-color overflow-hidden animate-in zoom-in duration-300">
+            <div class="p-8 border-b border-border-color">
+                <h3 class="text-xl font-bold text-text-main">Add Section</h3>
+            </div>
+            <div class="p-8 space-y-4">
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Section Name</label>
+                    <input type="text" id="section-name"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        placeholder="e.g. CSE-A">
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Department</label>
+                    <select id="section-dept"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main">
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Batch Start Year</label>
+                        <input type="number" id="section-start"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            placeholder="2023">
+                    </div>
+                    <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Batch End Year</label>
+                        <input type="number" id="section-end"
+                            class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                            placeholder="2027">
+                    </div>
+                </div>
+                <div><label class="block text-xs font-bold text-text-muted uppercase mb-2">Student Count</label>
+                    <input type="number" id="section-count"
+                        class="w-full bg-main border border-border-color rounded-xl px-4 py-3 text-text-main"
+                        placeholder="60">
+                </div>
+            </div>
+            <div class="p-8 bg-main flex gap-3">
+                <button onclick="toggleModal('modal-section', false)"
+                    class="flex-1 px-4 py-3 font-bold text-text-muted hover:text-text-main">Cancel</button>
+                <button onclick="saveSemester()"
+                    class="flex-1 bg-red-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors">Add
+                    Section</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="app.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeWeaver | Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/theme-config.js"></script>
+    <script src="assets/js/seed-data.js"></script> <!-- Sample Data Seeder -->
+</head>
+
+<body
+    class="h-screen flex items-center justify-center p-4 relative overflow-hidden bg-main text-text-main transition-colors duration-300">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 z-0">
+        <div
+            class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-red-500/20 rounded-full blur-[100px] animate-pulse">
+        </div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-fuchsia-500/20 rounded-full blur-[100px] animate-pulse"
+            style="animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" onclick="toggleTheme()"
+        class="absolute top-6 right-6 z-50 w-10 h-10 rounded-full bg-card border border-border-color shadow-lg flex items-center justify-center text-primary transition-all hover:scale-110">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <div class="w-full max-w-md relative z-10 animate-fade-in-up">
+        <!-- Brand Logo -->
+        <div class="text-center mb-8">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 to-black shadow-lg shadow-red-500/50 mb-4 transform hover:scale-105 transition-transform">
+                <i class="fa-solid fa-layer-group text-3xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-black text-text-main tracking-tight mb-1 neon-text">TimeWeaver</h1>
+            <p class="text-red-500 font-medium">Next-Gen University Scheduling</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-card p-8 rounded-3xl shadow-2xl relative overflow-hidden border border-border-color">
+            <div
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50">
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <!-- Role Selector -->
+                <div class="grid grid-cols-3 gap-2 p-1 bg-main rounded-xl border border-border-color">
+                    <button type="button" class="role-btn active py-2.5 text-sm font-bold rounded-lg transition-all"
+                        data-role="admin">Admin</button>
+                    <button type="button" class="role-btn py-2.5 text-sm font-bold rounded-lg transition-all"
+                        data-role="faculty">Faculty</button>
+                    <button type="button" class="role-btn py-2.5 text-sm font-bold rounded-lg transition-all"
+                        data-role="student">Student</button>
+                </div>
+
+                <!-- Inputs -->
+                <div class="space-y-4">
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-red-500 transition-colors"></i>
+                        <input type="text" id="username"
+                            class="w-full pl-12 pr-4 py-3.5 bg-main border border-border-color rounded-xl text-text-main placeholder-text-muted focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all font-medium"
+                            placeholder="Username / ID" required>
+                    </div>
+
+                    <div class="relative group">
+                        <i
+                            class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-red-500 transition-colors"></i>
+                        <input type="password" id="password"
+                            class="w-full pl-12 pr-12 py-3.5 bg-main border border-border-color rounded-xl text-text-main placeholder-text-muted focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 transition-all font-medium"
+                            placeholder="Password" required>
+                        <button type="button" id="togglePassword"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main transition-colors">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage"
+                    class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center font-bold">
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                    class="w-full py-3.5 bg-gradient-to-r from-red-600 to-black hover:from-red-500 hover:to-gray-900 text-white font-bold rounded-xl shadow-lg shadow-red-900/40 transform hover:-translate-y-0.5 transition-all text-sm uppercase tracking-wide neon-border">
+                    Access Portal <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+
+                <!-- Admin Register Link (Hidden by default) -->
+                <div id="adminRegisterContainer" class="text-center pt-2 hidden">
+                    <p class="text-xs text-text-muted">New Administrator? <a href="#" id="showRegister"
+                            class="text-red-500 hover:text-red-400 font-bold transition-colors">Initialize System</a>
+                    </p>
+                </div>
+            </form>
+
+            <!-- Registration Form (Admin Only) -->
+            <form id="registerForm" class="hidden space-y-5">
+                <div class="text-center mb-4">
+                    <h3 class="text-lg font-bold text-text-main">System Initialization</h3>
+                    <p class="text-xs text-text-muted">Create Root Administrator</p>
+                </div>
+
+                <div class="space-y-3">
+                    <input type="text" id="reg-fullname"
+                        class="w-full px-4 py-3 bg-main border border-border-color rounded-xl text-text-main text-sm focus:border-red-500 focus:outline-none"
+                        placeholder="Full Name" required>
+                    <input type="text" id="reg-username"
+                        class="w-full px-4 py-3 bg-main border border-border-color rounded-xl text-text-main text-sm focus:border-red-500 focus:outline-none"
+                        placeholder="Username" required>
+                    <input type="password" id="reg-password"
+                        class="w-full px-4 py-3 bg-main border border-border-color rounded-xl text-text-main text-sm focus:border-red-500 focus:outline-none"
+                        placeholder="Master Key" required>
+                </div>
+
+                <button type="submit"
+                    class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-colors text-sm">Create
+                    Admin</button>
+                <div class="text-center">
+                    <a href="#" id="showLogin"
+                        class="text-xs text-text-muted hover:text-text-main transition-colors">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <p class="text-center text-text-muted text-xs mt-8">
+            &copy; 2025 TimeWeaver Systems. <span class="text-text-main">Secure. Fast. Intelligent.</span>
+        </p>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let currentRole = 'student';
+
+        // Role Switching Logic
+        const roleBtns = document.querySelectorAll('.role-btn');
+        const adminRegContainer = document.getElementById('adminRegisterContainer');
+
+        roleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update UI
+                roleBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-red-500', 'text-white', 'shadow-lg', 'shadow-red-500/25');
+                    b.classList.add('text-text-muted', 'hover:bg-main', 'hover:text-text-main');
+                });
+                btn.classList.add('active', 'bg-red-500', 'text-white', 'shadow-lg', 'shadow-red-500/25');
+                btn.classList.remove('text-text-muted', 'hover:bg-main');
+
+                // Update State
+                currentRole = btn.dataset.role;
+
+                // Show/Hide Admin Register Link
+                if (currentRole === 'admin') {
+                    checkAdminLink();
+                } else {
+                    adminRegContainer.classList.add('hidden');
+                }
+            });
+        });
+
+        // Initialize First Button Style (Corrected)
+        const defaultBtn = document.querySelector(`.role-btn[data-role="${currentRole}"]`);
+        if (defaultBtn) defaultBtn.click();
+
+
+        // Toggle Password Visibility
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                icon.classList.add('text-red-400');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                icon.classList.remove('text-red-400');
+            }
+        });
+
+        // Form Switching
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        document.getElementById('showRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+        });
+
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        });
+
+        // --- AUTH FUNCTIONS ---
+        async function checkAdminLink() {
+            adminRegContainer.classList.remove('hidden');
+        }
+
+        // --- LOGIN LOGIC ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMessage');
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        role: currentRole
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success
+                    localStorage.setItem('tw_session', JSON.stringify({
+                        ...data,
+                        timestamp: Date.now()
+                    }));
+
+                    // Redirect based on role
+                    const paths = {
+                        admin: 'admin/index.html',
+                        faculty: 'faculty/index.html',
+                        student: 'student/index.html'
+                    };
+
+                    let path = paths[currentRole];
+                    window.location.href = path;
+                } else {
+                    // Error
+                    errorMsg.innerText = data.error || 'Invalid credentials';
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                errorMsg.innerText = 'Connection error. Is server running?';
+                errorMsg.classList.remove('hidden');
+            }
+        });
+
+        // --- REGISTER LOGIC ---
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('reg-fullname').value;
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fullName,
+                        username,
+                        password,
+                        role: 'admin'
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Admin Registered! Please login.');
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error');
+            }
+        });
+    </script>
+</body>
+
+</html>

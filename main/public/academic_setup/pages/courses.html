@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses Management - TimeWeaver</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">⏱</div>
+            <h1>TimeWeaver</h1>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="courses.html" class="menu-item active">📚 Courses</a></li>
+            <li><a href="departments.html" class="menu-item">🏢 Departments</a></li>
+            <li><a href="semesters.html" class="menu-item">📅 Semesters</a></li>
+            <li><a href="sections.html" class="menu-item">👥 Sections</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../../admin/index.html" class="logout-btn">🏠 Admin Dashboard</a>
+            <a href="../../login.html" class="logout-btn">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Courses Management</h1>
+                <p class="page-subtitle">Manage academic courses and course details</p>
+            </div>
+            <button class="btn-primary" onclick="openAddModal()">+ Add New Course</button>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <h3>Filters</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="filterDepartment">Department</label>
+                    <select id="filterDepartment" onchange="applyFilters()">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filterElective">Elective</label>
+                    <select id="filterElective" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filterLab">Lab Required</label>
+                    <select id="filterLab" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCourses">0</div>
+                <div class="stat-label">Total Courses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="electiveCourses">0</div>
+                <div class="stat-label">Elective Courses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="labCourses">0</div>
+                <div class="stat-label">Lab Courses</div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search courses..." onkeyup="searchCourses()">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Credits</th>
+                        <th>Department</th>
+                        <th>Elective</th>
+                        <th>Lab</th>
+                        <th>Theory Hrs</th>
+                        <th>Lab Hrs</th>
+                        <th>Tutorial Hrs</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="coursesTableBody">
+                    <tr>
+                        <td colspan="10" class="loading">Loading courses...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Add/Edit Course Modal -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Course</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="courseForm" onsubmit="saveCourse(event)">
+                    <input type="hidden" id="courseId">
+                    
+                    <div class="form-group">
+                        <label for="courseCode">Course Code <span class="required">*</span></label>
+                        <input type="text" id="courseCode" required placeholder="e.g., CS101">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseTitle">Course Title <span class="required">*</span></label>
+                        <input type="text" id="courseTitle" required placeholder="e.g., Introduction to Computer Science">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseCredits">Credits <span class="required">*</span></label>
+                        <input type="number" id="courseCredits" required min="1" max="10" placeholder="e.g., 3">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseDepartment">Department <span class="required">*</span></label>
+                        <select id="courseDepartment" required>
+                            <option value="">Select Department</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseDescription">Description</label>
+                        <textarea id="courseDescription" placeholder="Course description..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="theoryHours">Theory Hours per Week</label>
+                        <input type="number" id="theoryHours" min="0" max="20" placeholder="e.g., 3">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="labHours">Lab Hours per Week</label>
+                        <input type="number" id="labHours" min="0" max="20" placeholder="e.g., 2">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tutorialHours">Tutorial Hours per Week</label>
+                        <input type="number" id="tutorialHours" min="0" max="20" placeholder="e.g., 1">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isElective">
+                        <label for="isElective">Is Elective Course</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="requiresLab">
+                        <label for="requiresLab">Requires Lab</label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Course</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/courses.js"></script>
+</body>
+</html>

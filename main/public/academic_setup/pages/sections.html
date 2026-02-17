@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sections Management - TimeWeaver</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">⏱</div>
+            <h1>TimeWeaver</h1>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="courses.html" class="menu-item">📚 Courses</a></li>
+            <li><a href="departments.html" class="menu-item">🏢 Departments</a></li>
+            <li><a href="semesters.html" class="menu-item">📅 Semesters</a></li>
+            <li><a href="sections.html" class="menu-item active">👥 Sections</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../../admin/index.html" class="logout-btn">🏠 Admin Dashboard</a>
+            <a href="../../login.html" class="logout-btn">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Sections Management</h1>
+                <p class="page-subtitle">Manage academic sections for different semesters</p>
+            </div>
+            <button class="btn-primary" onclick="openAddModal()">+ Add New Section</button>
+        </div>
+
+        <div class="filters-section">
+            <h3>Filters</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="filterSemester">Department</label>
+                    <select id="filterSemester" onchange="applyFilters()">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSections">0</div>
+                <div class="stat-label">Total Sections</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search sections..." onkeyup="searchSections()">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Section Name</th>
+                        <th>Department</th>
+                        <th>Batch Years</th>
+                        <th>Student Count</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sectionsTableBody">
+                    <tr><td colspan="5" class="loading">Loading sections...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="sectionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Section</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="sectionForm" onsubmit="saveSection(event)">
+                    <input type="hidden" id="sectionId">
+                    
+                    <div class="form-group">
+                        <label for="sectionName">Section Name <span class="required">*</span></label>
+                        <input type="text" id="sectionName" required placeholder="e.g., CSE-A">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="departmentId">Department <span class="required">*</span></label>
+                        <select id="departmentId" required>
+                            <option value="">Select Department</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="batchYearStart">Batch Year Start <span class="required">*</span></label>
+                        <input type="number" id="batchYearStart" required min="2020" max="2100" placeholder="e.g., 2023">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="batchYearEnd">Batch Year End <span class="required">*</span></label>
+                        <input type="number" id="batchYearEnd" required min="2020" max="2100" placeholder="e.g., 2027">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentCount">Student Count <span class="required">*</span></label>
+                        <input type="number" id="studentCount" required min="1" max="200" placeholder="e.g., 60">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Section</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/sections.js"></script>
+</body>
+</html>

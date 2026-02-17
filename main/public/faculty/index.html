@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeWeaver Faculty | v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/theme-config.js"></script>
+    <style>
+        .sidebar-item.active {
+            background-color: rgba(179, 25, 25, 0.1);
+            color: var(--primary);
+            border-right: 4px solid var(--primary);
+        }
+    </style>
+</head>
+
+<body class="bg-main text-text-main transition-colors duration-300">
+
+    <div class="flex h-screen overflow-hidden">
+        <aside
+            class="w-64 bg-card border-r border-border-color flex flex-col hidden md:flex transition-colors duration-300">
+            <div class="p-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-red-600 to-black rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30">
+                        <i class="fa-solid fa-chalkboard-user text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-xl tracking-tight text-text-main neon-text">TimeWeaver</h1>
+                        <p class="text-xs text-red-400 font-bold uppercase tracking-wider">Faculty Portal</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2 mt-2">
+                <button onclick="showPage('dashboard')" id="btn-dashboard"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-red-400 transition-all active">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span class="font-medium text-sm">Dashboard</span>
+                </button>
+                <button onclick="showPage('schedule')" id="btn-schedule"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-red-400 transition-all">
+                    <i class="fa-solid fa-calendar-week w-5"></i>
+                    <span class="font-medium text-sm">My Schedule</span>
+                </button>
+                <button id="theme-toggle" onclick="toggleTheme()"
+                    class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-moon w-5"></i>
+                    <span class="font-medium text-sm">Toggle Theme</span>
+                </button>
+            </nav>
+
+            <div class="p-4 mt-auto border-t border-border-color">
+                <div class="flex items-center gap-3 px-4 py-3 mb-2 rounded-lg hover:bg-main transition-all cursor-pointer"
+                    title="My Profile">
+                    <div
+                        class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-400 font-bold text-xs ring-2 ring-red-500/20">
+                        FA
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-text-main truncate" id="current-user-name">Dr. Sarah Thorne</p>
+                        <p class="text-xs text-text-muted truncate">Computer Science</p>
+                    </div>
+                </div>
+                <a href="../login.html"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-500/10 transition-all">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-5"></i>
+                    <span class="font-bold text-sm">Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto relative">
+
+
+            <!-- DASHBOARD PAGE -->
+            <div id="page-dashboard" class="page-content p-8">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-extrabold text-text-main">Faculty Dashboard</h2>
+                    <p class="text-text-muted mt-1">Welcome back, here is your daily overview.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Stats Column -->
+                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div
+                            class="bg-card p-6 rounded-2xl border border-border-color shadow-sm hover:border-red-500/30 transition-all glass-panel">
+                            <div
+                                class="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center mb-4 text-red-400 shadow-[0_0_10px_rgba(179,25,25,0.2)]">
+                                <i class="fa-solid fa-clock text-xl"></i>
+                            </div>
+                            <p class="text-text-muted text-xs font-bold uppercase tracking-wider">Weekly Load</p>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <p class="text-3xl font-black text-text-main" id="stat-current-load">0</p>
+                                <p class="text-sm font-bold text-text-muted">/ <span id="stat-max-load">18</span> hrs
+                                </p>
+                            </div>
+                            <div class="w-full h-2 bg-main rounded-full mt-3 overflow-hidden">
+                                <div id="load-bar"
+                                    class="h-full bg-red-500 vector-glow-cyan rounded-full transition-all duration-1000"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-card p-6 rounded-2xl border border-border-color shadow-sm hover:border-red-500/30 transition-all glass-panel">
+                            <div
+                                class="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center mb-4 text-red-400 shadow-[0_0_10px_rgba(179,25,25,0.2)]">
+                                <i class="fa-solid fa-chalkboard-user text-xl"></i>
+                            </div>
+                            <p class="text-text-muted text-xs font-bold uppercase tracking-wider">Next Class</p>
+                            <div id="next-class-container">
+                                <p class="text-xl font-bold mt-1 text-text-main">No more classes today</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications / Quick Actions -->
+                    <div class="bg-card p-6 rounded-2xl border border-border-color shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 text-text-main">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button
+                                class="w-full flex items-center gap-3 p-3 rounded-xl border border-border-color hover:bg-main hover:border-red-500/30 transition text-left group">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center border border-green-500/20 group-hover:bg-green-500/20 transition-colors">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </div>
+                                <span
+                                    class="text-sm font-bold text-text-muted group-hover:text-text-main transition-colors">Request
+                                    Leave</span>
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 p-3 rounded-xl border border-border-color hover:bg-main hover:border-red-500/30 transition text-left group">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:bg-amber-500/20 transition-colors">
+                                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                                </div>
+                                <span
+                                    class="text-sm font-bold text-text-muted group-hover:text-text-main transition-colors">Swap
+                                    Class</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCHEDULE PAGE -->
+            <div id="page-schedule" class="page-content p-8 hidden">
+                <header class="mb-10 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-text-main">My Schedule</h2>
+                        <p class="text-text-muted mt-1">Weekly academic engagement.</p>
+                    </div>
+                    <button onclick="printSchedule()"
+                        class="bg-card border border-border-color text-text-muted px-4 py-2 rounded-lg text-sm font-bold hover:bg-main hover:text-text-main hover:border-red-500/50 shadow-sm transition-all">
+                        <i class="fa-solid fa-print mr-2"></i> Print
+                    </button>
+                </header>
+
+                <div class="bg-card rounded-2xl border border-border-color shadow-xl overflow-x-auto">
+                    <div class="min-w-[800px]">
+                        <div
+                            class="grid grid-cols-6 bg-main text-red-400 font-bold text-[11px] uppercase tracking-widest border-b border-border-color">
+                            <div class="p-5 border-r border-border-color text-center">Time</div>
+                            <div class="p-5 border-r border-border-color text-center">Monday</div>
+                            <div class="p-5 border-r border-border-color text-center">Tuesday</div>
+                            <div class="p-5 border-r border-border-color text-center">Wednesday</div>
+                            <div class="p-5 border-r border-border-color text-center">Thursday</div>
+                            <div class="p-5 text-center">Friday</div>
+                        </div>
+                        <div id="faculty-timetable-body">
+                            <!-- Classes will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Selection Modal (Simulating Login) -->
+    <div id="login-modal" class="fixed inset-0 bg-main/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-card w-full max-w-sm rounded-2xl shadow-2xl shadow-red-900/20 overflow-hidden p-8 text-center border border-border-color relative">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-red-500 to-black">
+            </div>
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-red-600 to-black rounded-full flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-red-500/40">
+                <i class="fa-solid fa-user-lock text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-text-main mb-2 neon-text">Faculty Login</h2>
+            <p class="text-sm text-text-muted mb-6 font-medium">Select your profile to continue</p>
+
+            <select id="user-select"
+                class="w-full bg-main border border-border-color rounded-xl px-4 py-3 mb-4 outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 font-bold text-text-muted transition-all">
+                <!-- Options populated by JS -->
+            </select>
+
+            <button onclick="login()"
+                class="w-full bg-gradient-to-r from-red-700 to-black text-white py-3 rounded-xl font-bold shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-[1.02] transition-all transform border border-white/10">
+                Access Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

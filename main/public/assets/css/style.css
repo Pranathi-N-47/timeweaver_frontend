@@ -1,0 +1,203 @@
+/* Theme Variables */
+:root {
+    /* Light Mode (Default) */
+    --bg-main: #f8fafc;
+    /* Slate 50 */
+    --bg-card: #ffffff;
+    /* White */
+    --text-main: rgb(179, 25, 25);
+    /* Custom Red */
+    --text-muted: #64748b;
+    /* Slate 500 */
+    --border: #e2e8f0;
+    /* Slate 200 */
+
+    --primary: rgb(179, 25, 25);
+    /* Custom Red */
+    --primary-glow: rgba(179, 25, 25, 0.5);
+
+    --accent: #d946ef;
+    /* Fuchsia 500 */
+    --accent-glow: rgba(217, 70, 239, 0.5);
+
+    --success: #22c55e;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode */
+    --bg-main: #020617;
+    /* Slate 950 */
+    --bg-card: #0f172a;
+    /* Slate 900 */
+    --text-main: #f8fafc;
+    /* Slate 50 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
+    --border: #1e293b;
+    /* Slate 800 */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Utilities */
+.neon-text {
+    text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.neon-border {
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.glass-panel {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Dashboard Layout */
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Custom Styling */
+.sidebar {
+    width: 260px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    border-right: 4px solid transparent;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+
+.nav-link.active {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--primary);
+    border-right-color: var(--primary);
+    text-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* Timetable Grid System */
+.timetable-wrapper {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.grid-header {
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    background: var(--bg-card);
+    /* Changed from hardcoded #0f172a */
+    color: var(--primary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border);
+    font-weight: 700;
+    text-shadow: 0 0 5px var(--primary-glow);
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    border-bottom: 1px solid var(--border);
+}
+
+.time-cell {
+    padding: 20px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-align: center;
+    border-right: 1px solid var(--border);
+    background: var(--bg-main);
+    /* Changed from rgba */
+}
+
+.slot-cell {
+    padding: 10px;
+    min-height: 120px;
+    border-right: 1px solid var(--border);
+    transition: background 0.2s;
+}
+
+.slot-cell:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Class Card Design */
+.class-card {
+    background: rgba(6, 182, 212, 0.1);
+    border-left: 4px solid var(--primary);
+    padding: 10px;
+    border-radius: 8px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal Styling */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: none;
+    /* Controlled by JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}

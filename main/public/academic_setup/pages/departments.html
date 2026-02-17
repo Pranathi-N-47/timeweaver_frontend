@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departments Management - TimeWeaver</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">⏱</div>
+            <h1>TimeWeaver</h1>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="courses.html" class="menu-item">📚 Courses</a></li>
+            <li><a href="departments.html" class="menu-item active">🏢 Departments</a></li>
+            <li><a href="semesters.html" class="menu-item">📅 Semesters</a></li>
+            <li><a href="sections.html" class="menu-item">👥 Sections</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="../../admin/index.html" class="logout-btn">🏠 Admin Dashboard</a>
+            <a href="../../login.html" class="logout-btn">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Departments Management</h1>
+                <p class="page-subtitle">Manage academic departments</p>
+            </div>
+            <button class="btn-primary" onclick="openAddModal()">+ Add New Department</button>
+        </div>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value" id="totalDepartments">0</div>
+                <div class="stat-label">Total Departments</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search departments..." onkeyup="searchDepartments()">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Head of Department</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="departmentsTableBody">
+                    <tr><td colspan="4" class="loading">Loading departments...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="departmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Department</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="departmentForm" onsubmit="saveDepartment(event)">
+                    <input type="hidden" id="departmentId">
+                    
+                    <div class="form-group">
+                        <label for="deptCode">Department Code <span class="required">*</span></label>
+                        <input type="text" id="deptCode" required placeholder="e.g., CSE">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deptName">Department Name <span class="required">*</span></label>
+                        <input type="text" id="deptName" required placeholder="e.g., Computer Science & Engineering">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deptHead">Head of Department</label>
+                        <input type="text" id="deptHead" placeholder="e.g., Dr. John Smith">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Department</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/departments.js"></script>
+</body>
+</html>
