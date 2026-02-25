@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Registration - TimeWeaver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+
+<body class="bg-main text-text-main">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-card border-r border-border-color flex flex-col hidden md:flex">
+            <div class="p-6 flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-red-600 to-black rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-graduation-cap text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl tracking-tight">TimeWeaver</h1>
+                    <p class="text-xs text-red-400 font-bold uppercase tracking-wider">Student Portal</p>
+                </div>
+            </div>
+            <nav class="flex-1 px-4 space-y-2 mt-4">
+                <a href="../student/index.html"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-text-muted hover:bg-main hover:text-primary transition-all">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span class="font-medium text-sm">Dashboard</span>
+                </a>
+                <a href="#"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-primary bg-red-500/10 border-r-4 border-primary transition-all">
+                    <i class="fa-solid fa-book-open w-5"></i>
+                    <span class="font-medium text-sm">Course Registration</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <header class="mb-10 flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-extrabold">Course Registration</h2>
+                    <p class="text-text-muted mt-1">Register for your courses and view backlogs.</p>
+                </div>
+                <div class="bg-card px-4 py-2 rounded-xl border border-border-color shadow-sm">
+                    <p class="text-sm font-bold">Registration Limit: <span id="reg-count"
+                            class="text-primary">0</span>/<span id="reg-limit">6</span></p>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Course Registration Section -->
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden glass-panel">
+                        <div class="p-6 border-b border-border-color flex justify-between items-center bg-main/50">
+                            <h3 class="font-bold text-lg">Available Courses</h3>
+                            <select id="semester-select"
+                                class="bg-main border border-border-color text-sm rounded-lg px-3 py-1 outline-none">
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                            </select>
+                        </div>
+                        <div class="p-6">
+                            <div id="available-courses-list" class="space-y-4">
+                                <!-- Courses will be injected here -->
+                                <div class="animate-pulse flex space-x-4">
+                                    <div class="flex-1 space-y-4 py-1">
+                                        <div class="h-4 bg-border-color rounded w-3/4"></div>
+                                        <div class="space-y-2">
+                                            <div class="h-4 bg-border-color rounded"></div>
+                                            <div class="h-4 bg-border-color rounded w-5/6"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card rounded-2xl border border-border-color shadow-sm overflow-hidden glass-panel">
+                        <div class="p-6 border-b border-border-color bg-main/50">
+                            <h3 class="font-bold text-lg">My Registered Courses</h3>
+                        </div>
+                        <div class="p-6">
+                            <div id="registered-courses-list" class="space-y-4">
+                                <p class="text-text-muted text-center py-4">No courses registered yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backlogs Section -->
+                <div class="space-y-6">
+                    <div
+                        class="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl shadow-sm relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-500/10 rounded-full blur-2xl"></div>
+                        <h3 class="font-bold text-lg text-red-500 mb-4 relative z-10"><i
+                                class="fa-solid fa-triangle-exclamation mr-2"></i>Backlog Subjects</h3>
+                        <div id="backlogs-list" class="space-y-3 relative z-10">
+                            <!-- Backlogs will be injected here -->
+                            <p class="text-red-400 text-sm italic">No backlogs detected. Great job!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification"
+        class="fixed bottom-8 right-8 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div
+            class="bg-slate-800 text-white px-6 py-4 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3">
+            <div id="notif-icon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+            <p id="notif-message" class="font-bold text-sm"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
